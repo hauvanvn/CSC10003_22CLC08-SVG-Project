@@ -25,7 +25,7 @@ public:
 	Polygon();
 	~Polygon();
 
-	void SetElement();
+	void SetElement(vector<string> s);
 	void SetPoints(vector<Point> point);
 	void SetFillColor(RGBA color);
 	void SetStroke(float width, RGBA color);
@@ -44,7 +44,7 @@ public:
 	Word();
 	~Word();
 
-	void SetElement();
+	void SetElement(vector<string> s);
 	void SetFont(string font);
 	void SetText(string text);
 	void SetSize(float size);
@@ -66,7 +66,7 @@ public:
 	Ellipse();
 	~Ellipse();
 
-	void SetElement();
+	void SetElement(vector<string> s);
 	void SetPosition(Point position);
 	void SetRadius(Point m_radius);
 	void SetColor(RGBA color);
@@ -86,6 +86,7 @@ public:
 	Circle();
 	~Circle();
 
+	void SetElement(vector<string> s);
 	void SetRadius(float radius);
 	void Draw(RenderWindow& window);
 
@@ -98,6 +99,8 @@ class Polyline
 public:
 	Polyline();
 	~Polyline();
+
+	void SetElement(vector<string> s);
 
 private:
 	vector<Point> points;

@@ -4,15 +4,21 @@
 #include "SFML/Audio.hpp"
 #include "SFML/Network.hpp"
 
+#include "Shape.h"
+
 using namespace sf;
 
 int main()
 {
 	RenderWindow window(VideoMode(1000, 500), "HAU", Style::Default);
 
-	RectangleShape rect;
-	rect.setFillColor(Color::Green);
-	rect.setSize(Vector2f(100, 100));
+	Polygon polygon;
+	polygon.SetElement();
+
+	Word text;
+	text.SetElement();
+
+
 
 	while (window.isOpen())
 	{
@@ -31,7 +37,8 @@ int main()
 		window.clear();
 
 		// Draw stuff
-		window.draw(rect);
+		polygon.Draw(window);
+		text.Draw(window);
 
 		// Finished drawing
 		window.display();

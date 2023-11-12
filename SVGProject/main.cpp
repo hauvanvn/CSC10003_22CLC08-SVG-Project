@@ -12,13 +12,6 @@ int main()
 {
 	RenderWindow window(VideoMode(1000, 500), "HAU", Style::Default);
 
-	Polygon polygon;
-	polygon.SetElement();
-
-	Word text;
-	text.SetElement();
-
-
 
 	while (window.isOpen())
 	{
@@ -37,8 +30,6 @@ int main()
 		window.clear();
 
 		// Draw stuff
-		polygon.Draw(window);
-		text.Draw(window);
 
 		// Finished drawing
 		window.display();

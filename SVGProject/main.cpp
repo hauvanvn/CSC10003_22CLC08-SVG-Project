@@ -10,7 +10,11 @@ using namespace sf;
 
 int main()
 {
-	RenderWindow window(VideoMode(1000, 500), "HAU", Style::Default);
+	RenderWindow window(VideoMode(1000, 600), "HAU", Style::Default);
+
+	Drawer shape;
+	shape.read("sample.svg");
+
 
 
 	while (window.isOpen())
@@ -30,6 +34,7 @@ int main()
 		window.clear();
 
 		// Draw stuff
+		shape.Draw(window);
 
 		// Finished drawing
 		window.display();

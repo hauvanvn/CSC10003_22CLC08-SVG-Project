@@ -4,144 +4,138 @@
 
 Polygon::Polygon()
 {
+	type = "";
+	stroke_width = height = width = -1;
+	stroke_color.R = stroke_color.G = stroke_color.B = 0;
+	color.R = color.G = color.B;
+	color.A = stroke_color.A = -1;
 }
 
 Polygon::~Polygon()
 {
 }
 
-void Polygon::SetElement(vector<string> s)
-{
-	point.push_back({ 350, 75 });
-	point.push_back({ 379, 161 });
-	point.push_back({ 469, 161 });
-	point.push_back({ 397, 215 });
-	point.push_back({ 423, 301 });
-	point.push_back({ 350, 250 });
-	point.push_back({ 277, 301 });
-	point.push_back({ 303, 215 });
-	point.push_back({ 231, 161 });
-	point.push_back({ 321, 161 });
+void Polygon::SetElement(vector<string> s) { //read vector from: void read(paramater)
+	type = s[0];
 
-	color = { 255, 255, 0, 255 * 0.6 };
-	stroke_width = 10;
-	stroke_color = { 255, 0, 0, 255 * 0.7 };
-
-	type = s[0]; // Assigns the first string in the vector as the 'type'.
-
-	for (int i = 1; i < s.size(); ++i) {
+	for (int i = 1; i < s.size(); ++i)
+	{
 		int gap = 0;
-
-		// Reconnects elements if the last character of the current string is not a double quote
-		if (s[i + 1][s[i + 1].length() - 1] != '"') {
-			// Concatenates subsequent strings until finding a closing quote
-			for (int j = i + 2; s[j - 1].back() != '"'; ++j) {
+		if (s[i + 1][s[i + 1].length() - 1] != '"') //reconnecting elements that were previously dislocate when using stringstream
+			for (int j = i + 2; s[j - 1].back() != '"'; ++j)
+			{
 				s[i + 1] = s[i + 1] + " " + s[j];
 				gap++;
 			}
-		}
 
-		// Removes double quotes from the string for conversion to numerical values
-		for (char& c: s[i + 1]) {
-			if (c == '"') {
-				c = ' ';
-			}
-		}
+		for (int j = 0; j < s[i + 1].length(); ++j) //removing " to for stof
+			if (s[i + 1][j] == '"')
+				s[i + 1][j] = ' ';
 
-		// Matches property keys and sets attributes accordingly
-		if (s[i] == "fill-opacity") {
+		if (s[i].compare("fill-opacity") == 0)
 			color.A = stof(s[++i]) * 255;
-		}
-		else if (s[i] == "stroke-opacity") {
+
+		else if (s[i].compare("stroke-opacity") == 0)
 			stroke_color.A = stof(s[++i]) * 255;
-		}
-		else if (s[i] == "stroke-width") {
+		else if (s[i].compare("stroke-width") == 0)
 			stroke_width = stof(s[++i]);
-		}
-		else if (s[i] == "height") {
+
+		else if (s[i].compare("height") == 0)
 			height = stof(s[++i]);
-		}
-		else if (s[i] == "width") {
+		else if (s[i].compare("width") == 0)
 			width = stof(s[++i]);
-		}
-		else if (s[i] == "stroke") {
+
+		else if (s[i].compare("stroke") == 0)
+		{
 			i++;
-			for (char& c : s[i]) {
-				if ((c < '0' || c > '9') && c != '.') {
-					c = ' ';
-				}
-			}
+			for (int j = 0; j < s[i].length(); ++j)
+				if ((s[i][j] < '0' || s[i][j] > '9') && s[i][j] != '.')
+					s[i][j] = ' ';
+
 			stringstream str(s[i]);
 			string temp;
+
 			str >> temp;
 			stroke_color.R = stof(temp);
+
 			str >> temp;
 			stroke_color.G = stof(temp);
+
 			str >> temp;
 			stroke_color.B = stof(temp);
 		}
-		else if (s[i] == "fill") {
+		else if (s[i].compare("fill") == 0)
+		{
 			i++;
-			for (char& c : s[i]) {
-				if ((c < '0' || c > '9') && c != '.') {
-					c = ' ';
-				}
-			}
+			for (int j = 0; j < s[i].length(); ++j)
+				if ((s[i][j] < '0' || s[i][j] > '9') && s[i][j] != '.')
+					s[i][j] = ' ';
+
 			stringstream str(s[i]);
 			string temp;
+
 			str >> temp;
 			color.R = stof(temp);
+
 			str >> temp;
 			color.G = stof(temp);
+
 			str >> temp;
 			color.B = stof(temp);
 		}
-		else if (s[i] == "x" || s[i] == "y") {
-			if (point.size() != 1) {
+
+		else if (s[i].compare("x") == 0 || s[i].compare("y") == 0)
+		{
+			if (point.size() != 1)
+			{
 				Point temp;
-				if (s[i] == "x") {
-					temp.x = stof(s[++i]);
-				}
-				else {
-					temp.y = stof(s[++i]);
-				}
+				if (s[i].compare("x") == 0)		temp.x = stof(s[++i]);
+				else	temp.y = stof(s[++i]);
 				point.push_back(temp);
 			}
-			else {
-				if (s[i] == "x") {
-					point[0].x = stof(s[++i]);
-				}
-				else {
-					point[0].y = stof(s[++i]);
-				}
+			else
+			{
+				if (s[i].compare("x") == 0)		point[0].x = stof(s[++i]);
+				else	point[0].y = stof(s[++i]);
 			}
 		}
-		else if (s[i] == "points") {
+		else if (s[i].compare("points") == 0)
+		{
 			i++;
 			stringstream str(s[i]);
 			string temp1;
-			for (int j = 0; str >> temp1; ++j) {
-				if (j % 2 == 0) {
+
+			for (int j = 0; str >> temp1; ++j)
+			{
+				if (j % 2 == 0)
+				{
 					Point temp2;
 					temp2.x = stof(temp1);
 					point.push_back(temp2);
 				}
-				else {
-					point[j / 2].y = stof(temp1);
-				}
+				else	point[j / 2].y = stof(temp1);
 			}
 		}
-		// ... (handling various other properties like 'stroke', 'fill', 'x', 'y', 'points')
 
-		i += gap; // Adjusts the index if there was reconnection
+		i += gap; //update index if there was a reconecting action
 	}
 
-	// If the point vector contains only one point, generates additional points to represent the corners of the polygon
-	if (point.size() == 1) {
+	if (point.size() == 1)
+	{
 		point.push_back({ point[0].x, point[0].y + height });
 		point.push_back({ point[0].x + width, point[0].y + height });
 		point.push_back({ point[0].x + width, point[0].y });
 	}
+}
+
+void Polygon::clear() { //use to reset a Polygon object
+	type = "";
+	stroke_width = height = width = -1;
+	stroke_color.R = stroke_color.G = stroke_color.B = 0;
+	color.R = color.G = color.B;
+	color.A = stroke_color.A = -1;
+
+	point.clear();
 }
 
 void Polygon::Draw(RenderWindow& window)
@@ -154,6 +148,7 @@ void Polygon::Draw(RenderWindow& window)
 	if (color.R != -1)
 		if (color.A != -1) polygon.setFillColor(Color(color.R, color.G, color.B, color.A));
 		else polygon.setFillColor(Color(color.R, color.G, color.B));
+
 	if (stroke_width != -1)
 		polygon.setOutlineThickness(stroke_width);
 	if (stroke_color.R != -1)
@@ -162,6 +157,7 @@ void Polygon::Draw(RenderWindow& window)
 
 	window.draw(polygon);
 }
+
 //////////////////////////////// Text \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 Word::Word()
@@ -556,5 +552,232 @@ void Polyline::SetElement(vector<string> s) {
 
 
 		i += gap; //update index if there was a reconecting action
+	}
+}
+
+void Polyline::clear() {
+	stroke_width = -1;
+	points.clear();
+	stroke_color.R = stroke_color.G = stroke_color.B = 0; 
+	color.R = color.G = color.B = 0;
+	color.A = stroke_color.A = -1;
+}
+
+void Polyline::DrawLine(RenderWindow& window, const Point& p1, const Point& p2)
+{
+	float length = sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
+	float posX = p1.x, posY = p1.y;
+	float rotation;
+
+	if (p1.x == p2.x && p1.y < p2.y) //rotate 90 degree anticlockwise
+	{
+		rotation = -90;
+		posY += stroke_width;
+	}
+	else if (p1.x == p2.x && p1.y > p2.y) //rotate 90 degree clockwise
+	{
+		rotation = 90;
+		posY += stroke_width;
+	}
+	else //rotate 'x' degree
+	{
+		rotation = (pow(length, 2) + pow(p1.x - p2.x, 2) - pow(p1.y - p2.y, 2)) / (2 * length * abs(p1.x - p2.x));
+		rotation = acos(rotation) * 180 / 3.141592; //go from radian to degree
+	}
+
+
+	RectangleShape lines(Vector2f(length, stroke_width));
+	lines.rotate(-1 * rotation); // multiply by -1 since rotate method rotate shape clockwise.
+	lines.setPosition(Vector2f(posX, posY));
+	if (stroke_color.R != -1)
+		if (stroke_color.A != -1) lines.setFillColor(Color(stroke_color.R, stroke_color.G, stroke_color.B, stroke_color.A));
+		else lines.setFillColor(Color(stroke_color.R, stroke_color.G, stroke_color.B));
+
+	window.draw(lines);
+}
+
+void Polyline::DrawPolyline(RenderWindow& window)
+{
+	if (points.size() <= 2)
+	{
+		DrawLine(window, points[0], points[1]);
+		return;
+	}
+
+	ConvexShape polyline;
+	if (color.R != -1)
+		if (color.A != -1) polyline.setFillColor(Color(color.R, color.G, color.B, color.A));
+		else polyline.setFillColor(Color(color.R, color.G, color.B));
+
+	vector<Point> pt;
+	for (int i = 0; i < points.size() - 1; ++i)
+	{
+		Point iPoint = FindIntersectionPoint(points[0], points.back(), points[i], points[i + 1]);
+		if (iPoint.x != -1)
+			if (pt.size() == 0) pt.push_back(iPoint);
+			else
+			{
+				pt.push_back(points[i]);
+				pt.push_back(iPoint);
+				polyline.setPointCount(pt.size());
+				for (int j = 0; j < pt.size(); ++j) polyline.setPoint(j, Vector2f(pt[j].x, pt[j].y));
+				window.draw(polyline);
+
+				pt.clear();
+				pt.push_back(iPoint);
+			}
+		else pt.push_back(points[i]);
+	}
+
+	for (int i = 0; i < points.size() - 1; ++i) DrawLine(window, points[i], points[i + 1]);
+}
+
+
+///////////////////////// Drawer \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+Drawer::Drawer()
+{
+}
+
+Drawer::~Drawer()
+{
+}
+
+void Drawer::read(string filename)
+{
+	ifstream file(filename);
+
+	string s;
+	getline(file, s);	//Skip the first two line
+	getline(file, s);
+
+	Polygon tempP;
+	Word tempW;
+	Ellipse tempE;
+	Circle tempC;
+	Polyline tempPL;
+
+	vector<string> collector;
+	string getter = "";
+	while (!file.eof())	//start to read svg file
+	{
+		getline(file, s);
+		if (s.compare("</svg>") == 0)
+			break;
+		for (int i = 0; i < s.length(); ++i)
+			if (s[i] == '<' || s[i] == '>' || s[i] == '/' || s[i] == '=' || s[i] == ',') //remove char to create space for stringstream
+				s[i] = ' ';
+
+		stringstream str(s);
+		while (str >> getter)
+			collector.push_back(getter);
+
+		if (collector[0].compare("rect") == 0 || collector[0].compare("polygon") == 0)
+		{
+			tempP.SetElement(collector);
+			polygon.push_back(tempP);
+
+			shapeID.push_back(0);
+			tempP.clear();
+		}
+		else if (collector[0].compare("text") == 0)
+		{
+			tempW.SetElement(collector);
+			text.push_back(tempW);
+
+			shapeID.push_back(1);
+			tempW.clear();
+		}
+		else if (collector[0].compare("ellipse") == 0)
+		{
+			tempE.SetElement(collector);
+			ellpise.push_back(tempE);
+
+			shapeID.push_back(2);
+			tempE.clear();
+		}
+		else if (collector[0].compare("circle") == 0)
+		{
+			tempC.SetElement(collector);
+			tempC.SetRadius(collector);
+			circle.push_back(tempC);
+
+			shapeID.push_back(3);
+			tempC.clear();
+			tempC.clearRadius();
+		}
+		else
+		{
+			tempPL.SetElement(collector);
+			polyline.push_back(tempPL);
+
+			shapeID.push_back(4);
+			tempPL.clear();
+		}
+
+		collector.clear();
+	}
+
+	file.close();
+}
+
+void Drawer::Draw(RenderWindow& window)
+{
+	vector<int> index(5, 0);
+
+	for (int i : shapeID)
+	{
+		switch (i)
+		{
+		case 0:
+			polygon[index[i]++].Draw(window);
+			break;
+			
+		case 1:
+			text[index[i]++].Draw(window);
+			break;
+
+		case 2:
+			ellpise[index[i]++].Draw(window);
+			break;
+
+		case 3:
+			circle[index[i]++].Draw(window);
+			break;
+
+		case 4:
+			polyline[index[i]++].DrawPolyline(window);
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
+Point FindIntersectionPoint(Point A, Point B, Point C, Point D)
+{
+	float a1 = B.y - A.y;
+	float b1 = A.x - B.x;
+	float c1 = a1 * A.x + b1 * A.y;
+
+	float a2 = D.y - C.y;
+	float b2 = C.x - D.x;
+	float c2 = a2 * C.x + b2 * C.y;
+
+
+	float determinant = a1 * b2 - a2 * b1;
+
+	if (determinant == 0)	
+	{
+		return {-1, -1};
+	}
+	else
+	{
+		float x = (b2 * c1 - b1 * c2) / determinant;
+		float y = (a1 * c2 - a2 * c1) / determinant;
+		{
+			return { x, y };
+		}
 	}
 }

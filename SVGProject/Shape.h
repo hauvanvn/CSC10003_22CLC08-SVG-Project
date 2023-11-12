@@ -30,9 +30,7 @@ public:
 	~Polygon();
 
 	void SetElement(vector<string> s);
-	void SetPoints(vector<Point> point);
-	void SetFillColor(RGBA color);
-	void SetStroke(float width, RGBA color);
+	void clear();
 	void Draw(RenderWindow& window);
 
 private:
@@ -79,7 +77,7 @@ protected:
 	RGBA stroke_color;
 };
 
-class Circle: public Ellipse
+class Circle : public Ellipse
 {
 public:
 	Circle();
@@ -100,6 +98,9 @@ public:
 	~Polyline();
 
 	void SetElement(vector<string> s);
+	void clear();
+	void DrawLine(RenderWindow& window, const Point& p1, const Point& p2);
+	void DrawPolyline(RenderWindow& window);
 
 private:
 	vector<Point> points;
@@ -107,5 +108,25 @@ private:
 	float stroke_width;
 	RGBA stroke_color;
 };
+
+class Drawer
+{
+public:
+	Drawer();
+	~Drawer();
+	void read(string filename);
+	void Draw(RenderWindow& window);
+
+private:
+	vector<Polygon> polygon;
+	vector<Word> text;
+	vector<Ellipse> ellpise;
+	vector<Circle> circle;
+	vector<Polyline> polyline;
+
+	vector<int> shapeID;
+};
+
+Point FindIntersectionPoint(Point A, Point B, Point C, Point D);
 
 #endif // !_SHAPE_H_

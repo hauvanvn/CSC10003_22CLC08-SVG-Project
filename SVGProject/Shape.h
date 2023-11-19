@@ -23,7 +23,15 @@ struct RGBA
 	float R, G, B, A;
 };
 
-class Polygon
+class Figure
+{
+protected:
+	RGBA color;
+	float stroke_width;
+	RGBA stroke_color;
+};
+
+class Polygon : private Figure
 {
 public:
 	Polygon();
@@ -31,18 +39,17 @@ public:
 
 	void SetElement(vector<string> s);
 	void clear();
-	void Draw(RenderWindow& window);
+
+	friend class Drawer;
 
 private:
 	string type;
 	vector<Point> point;
-	RGBA color;
 	float width, height;
-	float stroke_width;
-	RGBA stroke_color;
+	
 };
 
-class Word
+class Word : private Figure
 {
 public:
 	Word();
@@ -50,17 +57,17 @@ public:
 
 	void SetElement(vector<string> s);
 	void clear();
-	void Draw(RenderWindow& window);
+
+	friend class Drawer;
 
 private:
 	string font;
 	string text;
 	float size;
 	Point position;
-	RGBA color;
 };
 
-class Ellipse
+class Ellipse : protected Figure
 {
 public:
 	Ellipse();
@@ -68,7 +75,8 @@ public:
 
 	void SetElement(vector<string> s);
 	void clear();
-	void Draw(RenderWindow& window);
+
+	friend class Drawer;
 
 protected:
 	Point position, m_radius;
@@ -85,13 +93,14 @@ public:
 
 	void SetRadius(vector<string> s);
 	void clearRadius();
-	void Draw(RenderWindow& window);
+
+	friend class Drawer;
 
 private:
 	float radius;
 };
 
-class Polyline
+class Polyline : private Figure
 {
 public:
 	Polyline();
@@ -99,14 +108,11 @@ public:
 
 	void SetElement(vector<string> s);
 	void clear();
-	void DrawLine(RenderWindow& window, const Point& p1, const Point& p2);
-	void DrawPolyline(RenderWindow& window);
+
+	friend class Drawer;
 
 private:
 	vector<Point> points;
-	RGBA color;
-	float stroke_width;
-	RGBA stroke_color;
 };
 
 class Drawer
@@ -116,6 +122,13 @@ public:
 	~Drawer();
 	void read(string filename);
 	void Draw(RenderWindow& window);
+
+	void DrawPolygon(RenderWindow& window, Polygon shape);
+	void DrawWord(RenderWindow& window, Word shape);
+	void DrawEllipse(RenderWindow& window, Ellipse shape);
+	void DrawCircle(RenderWindow& window, Circle shape);
+	void DrawLine(RenderWindow& window, const Polyline& shape, const Point& p1, const Point& p2);
+	void DrawPolyline(RenderWindow& window, Polyline shape);
 
 private:
 	vector<Polygon> polygon;

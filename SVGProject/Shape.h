@@ -25,13 +25,22 @@ struct RGBA
 
 class Figure
 {
+public:
+	void SetColor(RGBA color);
+	void SetStrokeWidth(float width);
+	void SetStrokeColor(RGBA color);
+
+	RGBA GetColor();
+	float GetStrokeWidth();
+	RGBA GetStrokeColor();
+
 protected:
 	RGBA color;
 	float stroke_width;
 	RGBA stroke_color;
 };
 
-class Polygon : private Figure
+class Polygon : public Figure
 {
 public:
 	Polygon();
@@ -40,7 +49,9 @@ public:
 	void SetElement(vector<string> s);
 	void clear();
 
-	friend class Drawer;
+	void SetPosition(Point pt);
+
+	vector<Point> GetPosition();
 
 private:
 	string type;
@@ -49,7 +60,7 @@ private:
 	
 };
 
-class Word : private Figure
+class Word : public Figure
 {
 public:
 	Word();
@@ -58,7 +69,15 @@ public:
 	void SetElement(vector<string> s);
 	void clear();
 
-	friend class Drawer;
+	void SetFont(string font);
+	void SetText(string text);
+	void SetSize(float size);
+	void SetPosition(Point position);
+
+	string GetFont();
+	string GetText();
+	float GetSize();
+	Point GetPosition();
 
 private:
 	string font;
@@ -67,7 +86,7 @@ private:
 	Point position;
 };
 
-class Ellipse : protected Figure
+class Ellipse : public Figure
 {
 public:
 	Ellipse();
@@ -76,13 +95,14 @@ public:
 	void SetElement(vector<string> s);
 	void clear();
 
-	friend class Drawer;
+	void SetPoisition(Point position);
+	void SetMradius(Point m_radius);
+
+	Point GetPosition();
+	Point GetMradius();
 
 protected:
 	Point position, m_radius;
-	RGBA color;
-	float stroke_width;
-	RGBA stroke_color;
 };
 
 class Circle : public Ellipse
@@ -94,13 +114,15 @@ public:
 	void SetRadius(vector<string> s);
 	void clearRadius();
 
-	friend class Drawer;
+	void SetRadius(float radius);
+
+	float GetRadius();
 
 private:
 	float radius;
 };
 
-class Polyline : private Figure
+class Polyline : public Figure
 {
 public:
 	Polyline();
@@ -109,10 +131,33 @@ public:
 	void SetElement(vector<string> s);
 	void clear();
 
-	friend class Drawer;
+	void SetPosition(Point pt);
+
+	vector<Point> GetPosition();
 
 private:
 	vector<Point> points;
+};
+
+class Group: private Figure
+{
+public:
+	Group();
+	~Group();
+
+	void SetElement(vector<string> s);
+	void clear();
+
+private:
+	Point position;
+	Point center;
+	float rotation;
+
+	vector<Polygon> polygon;
+	vector<Word> text;
+	vector<Ellipse> ellpise;
+	vector<Circle> circle;
+	vector<Polyline> polyline;
 };
 
 class Drawer
@@ -127,8 +172,9 @@ public:
 	void DrawWord(RenderWindow& window, Word shape);
 	void DrawEllipse(RenderWindow& window, Ellipse shape);
 	void DrawCircle(RenderWindow& window, Circle shape);
-	void DrawLine(RenderWindow& window, const Polyline& shape, const Point& p1, const Point& p2);
+	void DrawLine(RenderWindow& window, Polyline shape, Point p1, Point p2);
 	void DrawPolyline(RenderWindow& window, Polyline shape);
+	void DrawGroup(RenderWindow& window, Group shape);
 
 private:
 	vector<Polygon> polygon;

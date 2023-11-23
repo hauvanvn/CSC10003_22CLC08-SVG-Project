@@ -1,5 +1,37 @@
 #include "Shape.h"
 #include <math.h>
+////////////////////////////// Figure \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+void Figure::SetColor(RGBA color)
+{
+	this->color = color;
+}
+
+void Figure::SetStrokeWidth(float width)
+{
+	this->stroke_width = width;
+}
+
+void Figure::SetStrokeColor(RGBA color)
+{
+	this->stroke_color = color;
+}
+
+RGBA Figure::GetColor()
+{
+	return this->color;
+}
+
+float Figure::GetStrokeWidth()
+{
+	return this->stroke_width;
+}
+
+RGBA Figure::GetStrokeColor()
+{
+	return this->stroke_color;
+}
+
 ///////////////////////////// Polygon \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 Polygon::Polygon()
@@ -138,6 +170,20 @@ void Polygon::clear() { //use to reset a Polygon object
 	point.clear();
 }
 
+void Polygon::SetPosition(Point pt)
+{
+	for (int i = 0; i < point.size(); ++i)
+	{
+		point[i].x += pt.x;
+		point[i].y += pt.y;
+	}
+}
+
+vector<Point> Polygon::GetPosition()
+{
+	return this->point;
+}
+
 //////////////////////////////// Text \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 Word::Word()
@@ -211,6 +257,46 @@ void Word::clear() {
 	size = 0;
 	position.x = position.y = 0;
 	color.R = color.G = color.B = 0;
+}
+
+void Word::SetFont(string font)
+{
+	this->font = font;
+}
+
+void Word::SetText(string text)
+{
+	this->text = text;
+}
+
+void Word::SetSize(float size)
+{
+	this->size = size;
+}
+
+void Word::SetPosition(Point position)
+{
+	this->position = position;
+}
+
+string Word::GetFont()
+{
+	return this->font;
+}
+
+string Word::GetText()
+{
+	return this->text;
+}
+
+float Word::GetSize()
+{
+	return this->size;
+}
+
+Point Word::GetPosition()
+{
+	return this->position;
 }
 
 ///////////////////////////////////////// Ellipse \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -315,6 +401,26 @@ void Ellipse::clear() {
 	color.A = stroke_color.A = -1;
 }
 
+void Ellipse::SetPoisition(Point position)
+{
+	this->position = position;
+}
+
+void Ellipse::SetMradius(Point m_radius)
+{
+	this->m_radius = m_radius;
+}
+
+Point Ellipse::GetPosition()
+{
+	return this->position;
+}
+
+Point Ellipse::GetMradius()
+{
+	return this->m_radius;
+}
+
 ///////////////////////////////////////// Circle \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 Circle::Circle()
@@ -340,6 +446,16 @@ void Circle::SetRadius(vector<string> s) {
 void Circle::clearRadius()
 {
 	radius = 0;
+}
+
+void Circle::SetRadius(float radius)
+{
+	this->radius = radius;
+}
+
+float Circle::GetRadius()
+{
+	return this->radius;
 }
 
 ////////////////////////// Polyline \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -476,6 +592,38 @@ void Polyline::clear() {
 	color.A = stroke_color.A = -1;
 }
 
+void Polyline::SetPosition(Point pt)
+{
+	for (int i = 0; i < points.size(); ++i)
+	{
+		points[i].x += pt.x;
+		points[i].y += pt.y;
+	}
+}
+
+vector<Point> Polyline::GetPosition()
+{
+	return points;
+}
+
+///////////////////////// Group \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+Group::Group()
+{
+}
+
+Group::~Group()
+{
+}
+
+void Group::SetElement(vector<string> s)
+{
+}
+
+void Group::clear()
+{
+}
+
 ///////////////////////// Drawer \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 Drawer::Drawer()
@@ -602,19 +750,24 @@ void Drawer::DrawPolygon(RenderWindow& window, Polygon shape)
 {
 	ConvexShape polygon;
 
-	polygon.setPointCount(shape.point.size()); 	//Setting points
-	for (int i = 0; i < shape.point.size(); ++i)
-		polygon.setPoint(i, Vector2f(shape.point[i].x, shape.point[i].y));
+	vector<Point> pt = shape.GetPosition();
+	RGBA color = shape.GetColor();
+	float stroke_width = shape.GetStrokeWidth();
+	RGBA stroke_color = shape.GetStrokeColor();
 
-	if (shape.color.R != -1) 	//Setting fill-color
-		if (shape.color.A != -1) polygon.setFillColor(Color(shape.color.R, shape.color.G, shape.color.B, shape.color.A));
-		else polygon.setFillColor(Color(shape.color.R, shape.color.G, shape.color.B));
+	polygon.setPointCount(pt.size()); 	//Setting points
+	for (int i = 0; i < pt.size(); ++i)
+		polygon.setPoint(i, Vector2f(pt[i].x, pt[i].y));
 
-	if (shape.stroke_width != -1) //Setting stroke width & color
-		polygon.setOutlineThickness(shape.stroke_width);
-	if (shape.stroke_color.R != -1)
-		if (shape.stroke_color.A != -1) polygon.setOutlineColor(Color(shape.stroke_color.R, shape.stroke_color.G, shape.stroke_color.B, shape.stroke_color.A));
-		else polygon.setOutlineColor(Color(shape.stroke_color.R, shape.stroke_color.G, shape.stroke_color.B));
+	if (color.R != -1) 	//Setting fill-color
+		if (color.A != -1) polygon.setFillColor(Color(color.R, color.G, color.B, color.A));
+		else polygon.setFillColor(Color(color.R, color.G, color.B));
+
+	if (stroke_width != -1) //Setting stroke width & color
+		polygon.setOutlineThickness(stroke_width);
+	if (stroke_color.R != -1)
+		if (stroke_color.A != -1) polygon.setOutlineColor(Color(stroke_color.R, stroke_color.G, stroke_color.B, stroke_color.A));
+		else polygon.setOutlineColor(Color(stroke_color.R, stroke_color.G, stroke_color.B));
 
 	window.draw(polygon);
 }
@@ -622,24 +775,27 @@ void Drawer::DrawPolygon(RenderWindow& window, Polygon shape)
 void Drawer::DrawWord(RenderWindow& window, Word shape)
 {
 	Font font;
-	font.loadFromFile(shape.font);
+	font.loadFromFile(shape.GetFont());
 
 	Text text;
 	text.setFont(font);
-	text.setString(shape.text);
-	text.setCharacterSize(shape.size);
-	if (shape.color.R != -1)
-		if (shape.color.A != -1) text.setFillColor(Color(shape.color.R, shape.color.G, shape.color.B, shape.color.A));
-		else text.setFillColor(Color(shape.color.R, shape.color.G, shape.color.B));
-	text.setPosition(Vector2f(shape.position.x, shape.position.y - shape.size));
+	text.setString(shape.GetText());
+	text.setCharacterSize(shape.GetSize());
+
+	RGBA color = shape.GetColor();
+	Point position = shape.GetPosition();
+	if (color.R != -1)
+		if (color.A != -1) text.setFillColor(Color(color.R, color.G, color.B, color.A));
+		else text.setFillColor(Color(color.R, color.G, color.B));
+	text.setPosition(Vector2f(position.x, position.y - shape.GetSize()));
 
 	window.draw(text);
 }
 
 void Drawer::DrawEllipse(RenderWindow& window, Ellipse shape)
 {
-	float radius_x = shape.m_radius.x;
-	float radius_y = shape.m_radius.y;
+	float radius_x = shape.GetMradius().x;
+	float radius_y = shape.GetMradius().y;
 	unsigned short pointNum = 72; /*72 is the golden distribution of points to form ellipse*/
 	const double PI = atan(1) * 4;
 
@@ -654,18 +810,21 @@ void Drawer::DrawEllipse(RenderWindow& window, Ellipse shape)
 
 		ellipse.setPoint(i, sf::Vector2f(x, y));
 
-		if (shape.color.R != -1)
-			if (shape.color.A != -1) ellipse.setFillColor(Color(shape.color.R, shape.color.G, shape.color.B, shape.color.A));
-			else ellipse.setFillColor(Color(shape.color.R, shape.color.G, shape.color.B));
+		RGBA color = shape.GetColor();
+		float stroke_width = shape.GetStrokeWidth();
+		RGBA stroke_color = shape.GetStrokeColor();
+		if (color.R != -1)
+			if (color.A != -1) ellipse.setFillColor(Color(color.R, color.G, color.B, color.A));
+			else ellipse.setFillColor(Color(color.R, color.G, color.B));
 
-		if (shape.stroke_width != -1)
-			ellipse.setOutlineThickness(shape.stroke_width);
-		if (shape.stroke_color.R != -1)
-			if (shape.stroke_color.A != -1) ellipse.setOutlineColor(Color(shape.stroke_color.R, shape.stroke_color.G, shape.stroke_color.B, shape.stroke_color.A));
-			else ellipse.setOutlineColor(Color(shape.stroke_color.R, shape.stroke_color.G, shape.stroke_color.B));
+		if (stroke_width != -1)
+			ellipse.setOutlineThickness(stroke_width);
+		if (stroke_color.R != -1)
+			if (stroke_color.A != -1) ellipse.setOutlineColor(Color(stroke_color.R, stroke_color.G, stroke_color.B, stroke_color.A));
+			else ellipse.setOutlineColor(Color(stroke_color.R, stroke_color.G, stroke_color.B));
 	}
 
-	ellipse.setPosition(shape.position.x, shape.position.y);
+	ellipse.setPosition(shape.GetPosition().x, shape.GetPosition().y);
 	window.draw(ellipse);
 }
 
@@ -673,35 +832,41 @@ void Drawer::DrawCircle(RenderWindow& window, Circle shape)
 {
 	CircleShape circle;
 
-	circle.setPosition(Vector2f(shape.position.x - shape.radius, shape.position.y - shape.radius));
-	circle.setRadius(shape.radius);
-	if (shape.color.R != -1)
-		if (shape.color.A != -1) circle.setFillColor(Color(shape.color.R, shape.color.G, shape.color.B, shape.color.A));
-		else circle.setFillColor(Color(shape.color.R, shape.color.G, shape.color.B));
+	circle.setPosition(Vector2f(shape.GetPosition().x - shape.GetRadius(), shape.GetPosition().y - shape.GetRadius()));
+	circle.setRadius(shape.GetRadius());
 
-	if (shape.stroke_width != -1) circle.setOutlineThickness(shape.stroke_width);
-	if (shape.stroke_color.R != -1)
-		if (shape.stroke_color.A != -1) circle.setOutlineColor(Color(shape.stroke_color.R, shape.stroke_color.G, shape.stroke_color.B, shape.stroke_color.A));
-		else circle.setOutlineColor(Color(shape.stroke_color.R, shape.stroke_color.G, shape.stroke_color.B));
+	RGBA color = shape.GetColor();
+	float stroke_width = shape.GetStrokeWidth();
+	RGBA stroke_color = shape.GetStrokeColor();
+
+	if (color.R != -1)
+		if (color.A != -1) circle.setFillColor(Color(color.R, color.G, color.B, color.A));
+		else circle.setFillColor(Color(color.R, color.G, color.B));
+
+	if (stroke_width != -1) circle.setOutlineThickness(stroke_width);
+	if (stroke_color.R != -1)
+		if (stroke_color.A != -1) circle.setOutlineColor(Color(stroke_color.R, stroke_color.G, stroke_color.B, stroke_color.A));
+		else circle.setOutlineColor(Color(stroke_color.R, stroke_color.G, stroke_color.B));
 
 	window.draw(circle);
 }
 
-void Drawer::DrawLine(RenderWindow& window, const Polyline& shape, const Point& p1, const Point& p2)
+void Drawer::DrawLine(RenderWindow& window, Polyline shape, Point p1, Point p2)
 {
 	float length = sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
 	float posX = p1.x, posY = p1.y;
 	float rotation;
+	float stroke_width = shape.GetStrokeWidth();
 
 	if (p1.x == p2.x && p1.y < p2.y) //rotate 90 degree anticlockwise
 	{
 		rotation = -90;
-		posY += shape.stroke_width;
+		posY += stroke_width;
 	}
 	else if (p1.x == p2.x && p1.y > p2.y) //rotate 90 degree clockwise
 	{
 		rotation = 90;
-		posY += shape.stroke_width;
+		posY += stroke_width;
 	}
 	else //rotate 'x' degree
 	{
@@ -710,38 +875,41 @@ void Drawer::DrawLine(RenderWindow& window, const Polyline& shape, const Point& 
 	}
 
 
-	RectangleShape lines(Vector2f(length, shape.stroke_width));
+	RectangleShape lines(Vector2f(length, stroke_width));
 	lines.rotate(-1 * rotation); // multiply by -1 since rotate method rotate shape clockwise.
 	lines.setPosition(Vector2f(posX, posY));
-	if (shape.stroke_color.R != -1)
-		if (shape.stroke_color.A != -1) lines.setFillColor(Color(shape.stroke_color.R, shape.stroke_color.G, shape.stroke_color.B, shape.stroke_color.A));
-		else lines.setFillColor(Color(shape.stroke_color.R, shape.stroke_color.G, shape.stroke_color.B));
+	RGBA stroke_color = shape.GetStrokeColor();
+	if (stroke_color.R != -1)
+		if (stroke_color.A != -1) lines.setFillColor(Color(stroke_color.R, stroke_color.G, stroke_color.B, stroke_color.A));
+		else lines.setFillColor(Color(stroke_color.R, stroke_color.G, stroke_color.B));
 
 	window.draw(lines);
 }
 
 void Drawer::DrawPolyline(RenderWindow& window, Polyline shape)
 {
-	if (shape.points.size() <= 2)
+	vector<Point> points = shape.GetPosition();
+	if (points.size() <= 2)
 	{
-		DrawLine(window, shape, shape.points[0], shape.points[1]);
+		DrawLine(window, shape, points[0], points[1]);
 		return;
 	}
 
 	ConvexShape polyline;
-	if (shape.color.R != -1)
-		if (shape.color.A != -1) polyline.setFillColor(Color(shape.color.R, shape.color.G, shape.color.B, shape.color.A));
-		else polyline.setFillColor(Color(shape.color.R, shape.color.G, shape.color.B));
+	RGBA color = shape.GetColor();
+	if (color.R != -1)
+		if (color.A != -1) polyline.setFillColor(Color(color.R, color.G, color.B, color.A));
+		else polyline.setFillColor(Color(color.R, color.G, color.B));
 
 	vector<Point> pt;
-	for (int i = 0; i < shape.points.size() - 1; ++i)
+	for (int i = 0; i < points.size() - 1; ++i)
 	{
-		Point iPoint = FindIntersectionPoint(shape.points[0], shape.points.back(), shape.points[i], shape.points[i + 1]);
+		Point iPoint = FindIntersectionPoint(points[0], points.back(), points[i], points[i + 1]);
 		if (iPoint.x != -1)
 			if (pt.size() == 0) pt.push_back(iPoint);
 			else
 			{
-				pt.push_back(shape.points[i]);
+				pt.push_back(points[i]);
 				pt.push_back(iPoint);
 				polyline.setPointCount(pt.size());
 				for (int j = 0; j < pt.size(); ++j) polyline.setPoint(j, Vector2f(pt[j].x, pt[j].y));
@@ -750,10 +918,14 @@ void Drawer::DrawPolyline(RenderWindow& window, Polyline shape)
 				pt.clear();
 				pt.push_back(iPoint);
 			}
-		else pt.push_back(shape.points[i]);
+		else pt.push_back(points[i]);
 	}
 
-	for (int i = 0; i < shape.points.size() - 1; ++i) DrawLine(window, shape, shape.points[i], shape.points[i + 1]);
+	for (int i = 0; i < points.size() - 1; ++i) DrawLine(window, shape, points[i], points[i + 1]);
+}
+
+void Drawer::DrawGroup(RenderWindow& window, Group shape)
+{
 }
 
 Point FindIntersectionPoint(Point A, Point B, Point C, Point D)

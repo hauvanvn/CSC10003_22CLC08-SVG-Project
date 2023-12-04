@@ -1,188 +1,173 @@
 #pragma once
+#pragma once
 
 #ifndef _SHAPE_H_
 #define _SHAPE_H_
+#include "stdafx.h"
 
+#include "rapidxml.hpp"
 #include <vector>
-#include <cmath>
 #include <string>
 #include <sstream>
 #include <fstream>
 
+using namespace rapidxml;
 using namespace std;
 
-struct Point
+struct Point2D
 {
 	float x, y;
 };
-
-struct RGBA
-{
-	float R, G, B, A;
-};
+//
+//struct RGBA
+//{
+//	float R, G, B, A;
+//};
 
 class Figure
 {
 public:
-	void SetColor(RGBA color);
+	Figure() {
+		fillColor = strokeColor = "black";
+		fillColor_opa = strokeColor_opa = 1;
+		strokeWidth = 1;
+	}
+	/*void SetColor(RGBA color);
 	void SetStrokeWidth(float width);
 	void SetStrokeColor(RGBA color);
-	void SetAngle(float angle);
 
 	RGBA GetColor();
 	float GetStrokeWidth();
-	RGBA GetStrokeColor();
-	Point GetCenter();
-	float GetAngle();
+	RGBA GetStrokeColor();*/
 
 protected:
-	RGBA color;
-	float stroke_width;
-	RGBA stroke_color;
-	Point center;
-	float rotation;
+	string fillColor, strokeColor;
+	float fillColor_opa, strokeColor_opa;
+	float strokeWidth;
 };
 
-class Polygon : public Figure
+class PolygonShape : public Figure
 {
 public:
-	Polygon();
-	~Polygon();
+	PolygonShape();
+	~PolygonShape();
 
-	void SetElement(vector<string> s);
+	void SetElement(vector<string> data);
 	void clear();
 
-	void SetPosition(vector<Point> pt);
-	void SetCenter();
+	//void SetPosition(Point2D pt);
 
-	vector<Point> GetPosition();
+	//vector<Point2D> GetPosition();
 
 private:
-	vector<Point> point;
+	vector<Point2D> point;
 	float width, height;
-	
 };
 
-class Word : public Figure
+class Text : public Figure
 {
 public:
-	Word();
-	~Word();
+	Text();
+	~Text();
 
-	void SetElement(vector<string> s);
+	void SetElement(vector<string> data);
 	void clear();
-
-	void SetFont(string font);
-	void SetText(string text);
-	void SetSize(float size);
-	void SetPosition(Point position);
-
-	string GetFont();
-	string GetText();
-	float GetSize();
-	Point GetPosition();
-
+	//
+	//	void SetFont(string font);
+	//	void SetText(string text);
+	//	void SetSize(float size);
+	//	void SetPosition(Point2D position);
+	//
+	//	string GetFont();
+	//	string GetText();
+	//	float GetSize();
+	//	Point2D GetPosition();
+	//
 private:
 	string font;
 	string text;
 	float size;
-	Point position;
+	Point2D position;
 };
-
-class Ellipse : public Figure
+//
+class EllipseShape : public Figure
 {
 public:
-	Ellipse();
-	~Ellipse();
+	EllipseShape();
+	~EllipseShape();
 
-	void SetElement(vector<string> s);
+	void SetElement(vector<string> data);
+	void clear();
+	//
+	//	void SetPoisition(Point2D position);
+	//	void SetMradius(Point2D m_radius);
+	//
+	//	Point2D GetPosition();
+	//	Point2D GetMradius();
+	//
+private:
+	Point2D center;
+	float width, height;
+};
+
+class PolylineShape : public Figure
+{
+public:
+	PolylineShape();
+	~PolylineShape();
+
+	void SetElement(vector<string> data);
 	void clear();
 
-	void SetPosition(Point position);
-	void SetMradius(Point m_radius);
-	void SetCenter();
+	/*void SetPosition(Point2D pt);
 
-	Point GetPosition();
-	Point GetMradius();
-
-protected:
-	Point position, m_radius;
-};
-
-class Circle : public Ellipse
-{
-public:
-	Circle();
-	~Circle();
-
-	void SetRadius(vector<string> s);
-	void clearRadius();
-
-	void SetRadius(float radius);
-
-	float GetRadius();
+	vector<Point2D> GetPosition();*/
 
 private:
-	float radius;
+	vector<Point2D> points;
 };
 
-class Polyline : public Figure
-{
-public:
-	Polyline();
-	~Polyline();
-
-	void SetElement(vector<string> s);
-	void clear();
-
-	void SetPosition(vector<Point> pt);
-	void SetCenter();
-
-	vector<Point> GetPosition();
-
-private:
-	vector<Point> points;
-};
-
-class Group: public Figure
+class Group : public Figure
 {
 public:
 	Group();
 	~Group();
 
-	bool IsEmpty();
-	void SetElement(vector<string> s);
+	void SetElement(vector<string> data);
 	void clear();
 
-	void SetCenter();
-	void MovePosition();
-	void Rotate();
-
 	void setGroup(Group);
-	void setPolygon(vector<Polygon>);
-	void setWord(vector<Word>);
-	void setEllipse(vector<Ellipse>);
-	void setCircle(vector<Circle>);
-	void setPolyline(vector<Polyline>);
-	void setShapeId(vector<int>);
-
-	vector<Group> GetGroup();
-	vector<Polygon> GetPolygon();
-	vector<Word> GetText();
-	vector<Ellipse> GetEllipse();
-	vector<Circle> GetCircle();
-	vector<Polyline> GetPolyline();
+	void setPolygon(vector<PolygonShape>);
+	void setText(vector<Text>);
+	void setEllipse(vector<EllipseShape>);
+	void setPolyline(vector<PolylineShape>);
+	void setShapeID(vector<int>);
 private:
-	Point position;
-	
+	Point2D position;
+	Point2D anchor;
+	Point2D scale;
+	float rotation;
+
 	vector<Group> group;
-	vector<Polygon> polygon;
-	vector<Word> text;
-	vector<Ellipse> ellipse;
-	vector<Circle> circle;
-	vector<Polyline> polyline;
+	vector<PolygonShape> polygon;
+	vector<Text> text;
+	vector<EllipseShape> ellipse;
+	vector<PolylineShape> polyline;
 
 	vector<int> shapeID;
+};
+
+class Path : public Figure
+{
+public:
+	Path();
+	~Path();
+
+	void SetElement(vector<string> data);
+	void clear();
+
+private:
+	vector<Point2D> points;
 };
 
 class Drawer
@@ -190,33 +175,30 @@ class Drawer
 public:
 	Drawer();
 	~Drawer();
-	
-	void readData(string filename);
-	Group readGroup(istream&, vector<string>);
-	void processData(vector<string> data);
-	//void Draw(RenderWindow& window);
 
-	//void DrawPolygon(RenderWindow& window, Polygon shape);
-	//void DrawWord(RenderWindow& window, Word shape);
-	//void DrawEllipse(RenderWindow& window, Ellipse shape);
-	//void DrawCircle(RenderWindow& window, Circle shape);
-	//void DrawLine(RenderWindow& window, Polyline shape, Point p1, Point p2);
-	//void DrawPolyline(RenderWindow& window, Polyline shape);
-	//void DrawGroup(RenderWindow& window, Group shape);
+	void readData(string filename);
+	Group readGroup(xml_node<>*, vector<string>);
+	void processData(vector<string> data, string tag);
+	/*void Draw(RenderWindow& window);
+
+	void DrawPolygon(RenderWindow& window, Polygon shape);
+	void DrawWord(RenderWindow& window, Word shape);
+	void DrawEllipse(RenderWindow& window, Ellipse shape);
+	void DrawCircle(RenderWindow& window, Circle shape);
+	void DrawLine(RenderWindow& window, Polyline shape, Point2D p1, Point2D p2);
+	void DrawPolyline(RenderWindow& window, Polyline shape);
+	void DrawGroup(RenderWindow& window, Group shape);*/
 
 private:
-	vector<Polygon> polygon;
-	vector<Word> text;
-	vector<Ellipse> ellpise;
-	vector<Circle> circle;
-	vector<Polyline> polyline;
+	vector<PolygonShape> polygon;
+	vector<Text> text;
+	vector<EllipseShape> ellipse;
+	vector<PolylineShape> polyline;
 	vector<Group> group;
 
 	vector<int> shapeID;
 };
 
-Point FindIntersectionPoint(Point A, Point B, Point C, Point D);
-
-Point MovePoint(Point x, float rotation, Point center);
+Point2D FindIntersectionPoint2D(Point2D A, Point2D B, Point2D C, Point2D D);
 
 #endif // !_SHAPE_H_

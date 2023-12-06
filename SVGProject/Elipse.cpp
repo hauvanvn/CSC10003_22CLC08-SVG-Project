@@ -47,3 +47,18 @@ void EllipseShape::clear()
 	center.x = center.y = 0;
 	width = height = 0;
 }
+
+Point2D EllipseShape::GetPosition()
+{
+	return this->center;
+}
+
+float EllipseShape::GetWidth()
+{
+	return this->width;
+}
+
+float EllipseShape::GetHeight()
+{
+	return this->height;
+}

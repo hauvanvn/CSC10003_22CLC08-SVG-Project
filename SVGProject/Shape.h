@@ -6,6 +6,13 @@
 #include "stdafx.h"
 
 #include "rapidxml.hpp"
+#include <windows.h>
+#include <objidl.h>
+#include <gdiplus.h>
+
+using namespace Gdiplus;
+#pragma comment (lib,"Gdiplus.lib")
+
 #include <vector>
 #include <string>
 #include <sstream>
@@ -32,13 +39,14 @@ public:
 		fillColor_opa = strokeColor_opa = 1;
 		strokeWidth = 1;
 	}
-	/*void SetColor(RGBA color);
-	void SetStrokeWidth(float width);
-	void SetStrokeColor(RGBA color);
+	//void SetColor(RGBA color);
+	//void SetStrokeWidth(float width);
+	//void SetStrokeColor(RGBA color);
 
-	RGBA GetColor();
+	string GetFillColor();
+	float GetFillColor_opa();
 	float GetStrokeWidth();
-	RGBA GetStrokeColor();*/
+	//RGBA GetStrokeColor();
 
 protected:
 	string fillColor, strokeColor;
@@ -57,7 +65,9 @@ public:
 
 	//void SetPosition(Point2D pt);
 
-	//vector<Point2D> GetPosition();
+	vector<Point2D> GetPoints();
+	float GetWidth();
+	float GetHeight();
 
 private:
 	vector<Point2D> point;
@@ -78,11 +88,11 @@ public:
 	//	void SetSize(float size);
 	//	void SetPosition(Point2D position);
 	//
-	//	string GetFont();
-	//	string GetText();
-	//	float GetSize();
-	//	Point2D GetPosition();
-	//
+	string GetFont();
+	string GetText();
+	float GetSize();
+	Point2D GetPosition();
+
 private:
 	string font;
 	string text;
@@ -102,8 +112,9 @@ public:
 	//	void SetPoisition(Point2D position);
 	//	void SetMradius(Point2D m_radius);
 	//
-	//	Point2D GetPosition();
-	//	Point2D GetMradius();
+	Point2D GetPosition();
+	float GetWidth();
+	float GetHeight();
 	//
 private:
 	Point2D center;
@@ -119,9 +130,22 @@ public:
 	void SetElement(vector<string> data);
 	void clear();
 
-	/*void SetPosition(Point2D pt);
+	//void SetPosition(Point2D pt);
 
-	vector<Point2D> GetPosition();*/
+	vector<Point2D> GetPoints();
+
+private:
+	vector<Point2D> points;
+};
+
+class Path : public Figure
+{
+public:
+	Path();
+	~Path();
+
+	void SetElement(vector<string> data);
+	void clear();
 
 private:
 	vector<Point2D> points;
@@ -142,6 +166,7 @@ public:
 	void setEllipse(vector<EllipseShape>);
 	void setPolyline(vector<PolylineShape>);
 	void setShapeID(vector<int>);
+
 private:
 	Point2D position;
 	Point2D anchor;
@@ -153,21 +178,9 @@ private:
 	vector<Text> text;
 	vector<EllipseShape> ellipse;
 	vector<PolylineShape> polyline;
+	vector<Path> path;
 
 	vector<int> shapeID;
-};
-
-class Path : public Figure
-{
-public:
-	Path();
-	~Path();
-
-	void SetElement(vector<string> data);
-	void clear();
-
-private:
-	vector<Point2D> points;
 };
 
 class Drawer
@@ -179,15 +192,14 @@ public:
 	void readData(string filename);
 	Group readGroup(xml_node<>*, vector<string>);
 	void processData(vector<string> data, string tag);
-	/*void Draw(RenderWindow& window);
+	VOID Draw(HDC hdc);
 
-	void DrawPolygon(RenderWindow& window, Polygon shape);
-	void DrawWord(RenderWindow& window, Word shape);
-	void DrawEllipse(RenderWindow& window, Ellipse shape);
-	void DrawCircle(RenderWindow& window, Circle shape);
-	void DrawLine(RenderWindow& window, Polyline shape, Point2D p1, Point2D p2);
-	void DrawPolyline(RenderWindow& window, Polyline shape);
-	void DrawGroup(RenderWindow& window, Group shape);*/
+	VOID DrawPolygon(HDC hdc, PolygonShape shape);
+	VOID DrawText(HDC hdc, Text shape);
+	VOID DrawEllipse(HDC hdc, EllipseShape shape);
+	//void DrawLine(RenderWindow& window, Polyline shape, Point2D p1, Point2D p2);
+	VOID DrawPolyline(HDC hdc, PolylineShape shape);
+	VOID DrawGroup(HDC hdc, Group shape);
 
 private:
 	vector<PolygonShape> polygon;
@@ -195,10 +207,16 @@ private:
 	vector<EllipseShape> ellipse;
 	vector<PolylineShape> polyline;
 	vector<Group> group;
+	vector<Path> path;
 
 	vector<int> shapeID;
 };
 
 Point2D FindIntersectionPoint2D(Point2D A, Point2D B, Point2D C, Point2D D);
+
+#include <locale>
+#include <codecvt>
+
+wstring String2Wstring(string s);
 
 #endif // !_SHAPE_H_

@@ -29,6 +29,7 @@ void Drawer::processData(vector<string> collector, string tag)
 	Text tempT;
 	EllipseShape tempE;
 	PolylineShape tempL;
+	Path tempPa;
 
 	if (tag.compare("rect") == 0 || tag.compare("polygon") == 0)
 	{
@@ -57,6 +58,13 @@ void Drawer::processData(vector<string> collector, string tag)
 		polyline.push_back(tempL);
 		shapeID.push_back(4);
 		tempL.clear();
+	}
+	else if (tag.compare("path") == 0)
+	{
+		tempPa.SetElement(collector);
+		path.push_back(tempPa);
+		shapeID.push_back(5);
+		tempPa.clear();
 	}
 }
 
@@ -110,6 +118,7 @@ Group Drawer::readGroup(xml_node<>* node, vector<string> data)
 	result.setText(drawer.text);
 	result.setEllipse(drawer.ellipse);
 	result.setPolyline(drawer.polyline);
+	result.setPath(drawer.path);
 	result.setShapeID(drawer.shapeID);
 
 	return result;
@@ -160,7 +169,7 @@ void Drawer::readData(string filename)
 		{
 			Group tempG = readGroup(node, collector);
 			group.push_back(tempG);
-			shapeID.push_back(5);
+			shapeID.push_back(6);
 			tempG.clear();
 		}
 		else	processData(collector, nodeName);

@@ -25,23 +25,19 @@ struct Point2D
 {
 	float x, y;
 };
-//
-//struct RGBA
-//{
-//	float R, G, B, A;
-//};
+
+struct RGBA
+{
+	string color = "";
+	float R = 0, G = 0, B = 0, A = 1;
+};
 
 class Figure
 {
 public:
-	Figure() {
-		fillColor = strokeColor = "black";
-		fillColor_opa = strokeColor_opa = 1;
-		strokeWidth = 1;
-	}
-	//void SetColor(RGBA color);
-	//void SetStrokeWidth(float width);
-	//void SetStrokeColor(RGBA color);
+	/*void SetColor(RGBA color);
+	void SetStrokeWidth(float width);
+	void SetStrokeColor(RGBA color);
 
 	string GetFillColor();
 	float GetFillColor_opa();
@@ -151,6 +147,24 @@ private:
 	vector<Point2D> points;
 };
 
+struct PathShapes {
+	char type;
+	vector<Point2D> points;
+};
+
+class Path : public Figure
+{
+public:
+	Path();
+	~Path();
+
+	void SetElement(vector<string> data);
+	void clear();
+
+private:
+	vector<PathShapes> Shapes;
+};
+
 class Group : public Figure
 {
 public:
@@ -165,8 +179,8 @@ public:
 	void setText(vector<Text>);
 	void setEllipse(vector<EllipseShape>);
 	void setPolyline(vector<PolylineShape>);
+	void setPath(vector<Path>);
 	void setShapeID(vector<int>);
-
 private:
 	Point2D position;
 	Point2D anchor;

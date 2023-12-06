@@ -16,17 +16,60 @@ void Text::SetElement(vector<string> data)
 	for (int i = 1; i < data.size(); ++i)
 	{
 		if (data[i].compare("fill") == 0)
-			fillColor = data[++i];
+		{
+			size_t foundRGB = data[++i].find("rgb");
+			if(foundRGB == string::npos)
+				fillColor.color = data[i];
+			else
+			{
+				for(int j = 0; j < data[i].length(); ++j)
+					if ((data[i][j] < '0' || data[i][j] > '9') && data[i][j] != '.' && data[i][j] != '-')
+						data[i][j] = ' ';
+
+				stringstream str(data[i]);
+				string getter;
+
+				str >> getter;
+				fillColor.R = stof(getter);
+				str >> getter;
+				fillColor.G = stof(getter);
+				str >> getter;
+				fillColor.B = stof(getter);
+			}
+		}
+			
 		else if (data[i].compare("stroke") == 0)
-			strokeColor = data[++i];
+		{
+			size_t foundRGB = data[++i].find("rgb");
+			if (foundRGB == string::npos)
+				fillColor.color = data[i];
+			else
+			{
+				for (int j = 0; j < data[i].length(); ++j)
+					if ((data[i][j] < '0' || data[i][j] > '9') && data[i][j] != '.' && data[i][j] != '-')
+						data[i][j] = ' ';
+
+				stringstream str(data[i]);
+				string getter;
+
+				str >> getter;
+				fillColor.R = stof(getter);
+				str >> getter;
+				fillColor.G = stof(getter);
+				str >> getter;
+				fillColor.B = stof(getter);
+			}
+		}
 
 		else if (data[i].compare("fill-opacity") == 0)
-			fillColor_opa = stof(data[++i]);
+			fillColor.A = stof(data[++i]);
 		else if (data[i].compare("stroke-opacity") == 0)
-			strokeColor_opa = stof(data[++i]);
+			strokeColor.A = stof(data[++i]);
 		else if (data[i].compare("stroke-width") == 0)
 			strokeWidth = stof(data[++i]);					//Finish update attribute in Figure
 
+		else if (data[i].compare("font-family") == 0)
+			font = data[++i];
 		else if (data[i].compare("font-size") == 0)
 			size = stof(data[++i]);
 
@@ -38,8 +81,10 @@ void Text::SetElement(vector<string> data)
 }
 
 void Text::clear() {
-	fillColor = strokeColor = "black";
-	fillColor_opa = strokeColor_opa = 1;
+	fillColor.color = strokeColor.color = "";
+	fillColor.R = fillColor.G = fillColor.B = 0;
+	strokeColor.R = strokeColor.G = strokeColor.B = 0;
+	fillColor.A = strokeColor.A = 1;
 	strokeWidth = 1;
 
 	font = text = "";

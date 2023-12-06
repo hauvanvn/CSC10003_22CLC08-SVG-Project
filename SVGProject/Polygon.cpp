@@ -49,11 +49,11 @@ void PolygonShape::SetElement(vector<string> data)
 				string getter;
 
 				str >> getter;
-				fillColor.R = stof(getter);
+				strokeColor.R = stof(getter);
 				str >> getter;
-				fillColor.G = stof(getter);
+				strokeColor.G = stof(getter);
 				str >> getter;
-				fillColor.B = stof(getter);
+				strokeColor.B = stof(getter);
 			}
 		}
 

@@ -2,7 +2,7 @@
 #include "Shape.h"
 
 Text::Text() {
-	font = text = "";
+	font = "Times New Roman"; text = "";
 	size = 1;
 	position.x = position.y = 0;
 }
@@ -53,11 +53,11 @@ void Text::SetElement(vector<string> data)
 				string getter;
 
 				str >> getter;
-				fillColor.R = stof(getter);
+				strokeColor.R = stof(getter);
 				str >> getter;
-				fillColor.G = stof(getter);
+				strokeColor.G = stof(getter);
 				str >> getter;
-				fillColor.B = stof(getter);
+				strokeColor.B = stof(getter);
 			}
 		}
 
@@ -87,7 +87,7 @@ void Text::clear() {
 	fillColor.A = strokeColor.A = 1;
 	strokeWidth = 1;
 
-	font = text = "";
+	font = "Times New Roman"; text = "";
 	size = 1;
 	position.x = position.y = 0;
 }

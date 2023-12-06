@@ -37,17 +37,15 @@ class Figure
 public:
 	/*void SetColor(RGBA color);
 	void SetStrokeWidth(float width);
-	void SetStrokeColor(RGBA color);
+	void SetStrokeColor(RGBA color);*/
 
-	string GetFillColor();
-	float GetFillColor_opa();
+	RGBA GetFillColor();
+	RGBA GetStrokeColor();
 	float GetStrokeWidth();
-	//RGBA GetStrokeColor();
 
 protected:
-	string fillColor, strokeColor;
-	float fillColor_opa, strokeColor_opa;
-	float strokeWidth;
+	RGBA fillColor, strokeColor;
+	float strokeWidth = 1;
 };
 
 class PolygonShape : public Figure
@@ -58,8 +56,6 @@ public:
 
 	void SetElement(vector<string> data);
 	void clear();
-
-	//void SetPosition(Point2D pt);
 
 	vector<Point2D> GetPoints();
 	float GetWidth();
@@ -78,24 +74,18 @@ public:
 
 	void SetElement(vector<string> data);
 	void clear();
-	//
-	//	void SetFont(string font);
-	//	void SetText(string text);
-	//	void SetSize(float size);
-	//	void SetPosition(Point2D position);
-	//
+
 	string GetFont();
 	string GetText();
 	float GetSize();
 	Point2D GetPosition();
-
 private:
 	string font;
 	string text;
 	float size;
 	Point2D position;
 };
-//
+
 class EllipseShape : public Figure
 {
 public:
@@ -104,14 +94,11 @@ public:
 
 	void SetElement(vector<string> data);
 	void clear();
-	//
-	//	void SetPoisition(Point2D position);
-	//	void SetMradius(Point2D m_radius);
-	//
+
 	Point2D GetPosition();
 	float GetWidth();
 	float GetHeight();
-	//
+
 private:
 	Point2D center;
 	float width, height;
@@ -126,22 +113,7 @@ public:
 	void SetElement(vector<string> data);
 	void clear();
 
-	//void SetPosition(Point2D pt);
-
 	vector<Point2D> GetPoints();
-
-private:
-	vector<Point2D> points;
-};
-
-class Path : public Figure
-{
-public:
-	Path();
-	~Path();
-
-	void SetElement(vector<string> data);
-	void clear();
 
 private:
 	vector<Point2D> points;

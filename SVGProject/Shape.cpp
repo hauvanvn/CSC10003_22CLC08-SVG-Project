@@ -2,14 +2,14 @@
 #include "Shape.h"
 ////////////////////////////// Figure \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-string Figure::GetFillColor()
+RGBA Figure::GetFillColor()
 {
 	return this->fillColor;
 }
 
-float Figure::GetFillColor_opa()
+RGBA Figure::GetStrokeColor()
 {
-	return this->fillColor_opa;
+	return this->strokeColor;
 }
 
 float Figure::GetStrokeWidth()
@@ -187,28 +187,28 @@ VOID Drawer::Draw(HDC hdc)
 	{
 		switch (i)
 		{
-		case 0:
+		case 1:
 			DrawPolygon(hdc, polygon[index[i]++]);
 			break;
 
-		case 1:
+		case 2:
 			DrawText(hdc, text[index[i]++]);
 			break;
 
-		case 2:
+		case 3:
 			DrawEllipse(hdc, ellipse[index[i]++]);
 			break;
 
-		case 3:
+		case 4:
 			DrawPolyline(hdc, polyline[index[i]++]);
 			break;
 
-		case 4:
+		case 5:
 			//DrawPath(hdc, path[index[i]++]);
 			break;
 
-		case 5:
-			DrawGroup(hdc, group[index[i]++]);
+		case 6:
+			//DrawGroup(hdc, group[index[i]++]);
 			break;
 
 		default:
@@ -221,11 +221,13 @@ VOID Drawer::DrawPolygon(HDC hdc, PolygonShape shape)
 {
 	Graphics graphics(hdc);
 
-	Pen pen(Color(255, 255, 0, 0));
+	RGBA color = shape.GetStrokeColor();
+	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
 	pen.SetWidth(shape.GetStrokeWidth());
 
-	SolidBrush brush(Color(255, 0, 255, 0));
-	
+	color = shape.GetFillColor();
+	SolidBrush brush(Color(255 * color.A, color.R, color.G, color.B));
+
 	vector<Point2D> p = shape.GetPoints();
 	if (p.size() > 1)
 	{
@@ -252,11 +254,12 @@ VOID Drawer::DrawText(HDC hdc, Text shape)
 {
 	Graphics graphics(hdc);
 
-	//FontFamily fontFamily(String2Wstring(shape.GetFont()).c_str());
-	FontFamily fontFamily(L"Times New Roman");
+	RGBA color = shape.GetFillColor();
+
+	FontFamily fontFamily(String2Wstring(shape.GetFont()).c_str());
 	Font font(&fontFamily, shape.GetSize(), FontStyleRegular, UnitPixel);
 	PointF point(shape.GetPosition().x, shape.GetPosition().y - shape.GetSize());
-	SolidBrush solidBrush(Color(255, 0, 0, 255));
+	SolidBrush solidBrush(Color(255 * color.A, color.R, color.G, color.B));
 
 	graphics.DrawString(String2Wstring(shape.GetText()).c_str(), -1, &font, point, &solidBrush);
 }
@@ -265,10 +268,12 @@ VOID Drawer::DrawEllipse(HDC hdc, EllipseShape shape)
 {
 	Graphics graphics(hdc);
 
-	Pen pen(Color(255, 0, 0, 255));
+	RGBA color = shape.GetStrokeColor();
+	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
 	pen.SetWidth(shape.GetStrokeWidth());
 
-	SolidBrush brush(Color(255, 0, 100, 100));
+	color = shape.GetFillColor();
+	SolidBrush brush(Color(255 * color.A, color.R, color.G, color.B));
 
 	RectF ellipseRect(shape.GetPosition().x - shape.GetWidth(), shape.GetPosition().y - shape.GetHeight(), shape.GetWidth() * 2, shape.GetHeight() * 2);
 
@@ -280,10 +285,12 @@ VOID Drawer::DrawPolyline(HDC hdc, PolylineShape shape)
 {
 	Graphics graphics(hdc);
 
-	Pen pen(Color(255, 255, 0, 0));
+	RGBA color = shape.GetStrokeColor();
+	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
 	pen.SetWidth(shape.GetStrokeWidth());
 
-	SolidBrush brush(Color(255, 0, 255, 0));
+	color = shape.GetFillColor();
+	SolidBrush brush(Color(255 * color.A, color.R, color.G, color.B));
 
 	vector<Point2D> p = shape.GetPoints();
 	Point* pt = new Point[p.size()];

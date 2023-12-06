@@ -50,11 +50,11 @@ void EllipseShape::SetElement(vector<string> data)
 				string getter;
 
 				str >> getter;
-				fillColor.R = stof(getter);
+				strokeColor.R = stof(getter);
 				str >> getter;
-				fillColor.G = stof(getter);
+				strokeColor.G = stof(getter);
 				str >> getter;
-				fillColor.B = stof(getter);
+				strokeColor.B = stof(getter);
 			}
 		}
 
@@ -70,11 +70,11 @@ void EllipseShape::SetElement(vector<string> data)
 		else if (data[i].compare("cy") == 0)
 			center.y = stof(data[++i]);
 		else if (data[i].compare("rx") == 0)
-			width = 2 * stof(data[++i]);
+			width = stof(data[++i]);
 		else if (data[i].compare("ry") == 0)
-			height = 2 * stof(data[++i]);
+			height = stof(data[++i]);
 		else if (data[i].compare("r") == 0)					//This is for circle
-			width = height = 2 * stof(data[++i]);
+			width = height = stof(data[++i]);
 	}
 }
 

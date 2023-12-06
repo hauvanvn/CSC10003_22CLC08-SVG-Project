@@ -158,6 +158,7 @@
   <ItemGroup>
     <ClCompile Include="Elipse.cpp" />
     <ClCompile Include="Group.cpp" />
+    <ClCompile Include="Path.cpp" />
     <ClCompile Include="Polygon.cpp" />
     <ClCompile Include="Polyline.cpp" />
     <ClCompile Include="Shape.cpp" />

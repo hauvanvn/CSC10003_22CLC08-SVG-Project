@@ -134,3 +134,7 @@ void PolylineShape::clear()
 	points.clear();
 }
 
+vector<Point2D> PolylineShape::GetPoints()
+{
+	return this->points;
+}

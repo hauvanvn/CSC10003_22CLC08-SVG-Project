@@ -6,6 +6,13 @@
 #include "stdafx.h"
 
 #include "rapidxml.hpp"
+#include <windows.h>
+#include <objidl.h>
+#include <gdiplus.h>
+
+using namespace Gdiplus;
+#pragma comment (lib,"Gdiplus.lib")
+
 #include <vector>
 #include <string>
 #include <sstream>
@@ -30,11 +37,11 @@ class Figure
 public:
 	/*void SetColor(RGBA color);
 	void SetStrokeWidth(float width);
-	void SetStrokeColor(RGBA color);
+	void SetStrokeColor(RGBA color);*/
 
-	RGBA GetColor();
+	RGBA GetFillColor();
+	RGBA GetStrokeColor();
 	float GetStrokeWidth();
-	RGBA GetStrokeColor();*/
 
 protected:
 	RGBA fillColor, strokeColor;
@@ -50,9 +57,9 @@ public:
 	void SetElement(vector<string> data);
 	void clear();
 
-	//void SetPosition(Point2D pt);
-
-	//vector<Point2D> GetPosition();
+	vector<Point2D> GetPoints();
+	float GetWidth();
+	float GetHeight();
 
 private:
 	vector<Point2D> point;
@@ -67,24 +74,18 @@ public:
 
 	void SetElement(vector<string> data);
 	void clear();
-	//
-	//	void SetFont(string font);
-	//	void SetText(string text);
-	//	void SetSize(float size);
-	//	void SetPosition(Point2D position);
-	//
-	//	string GetFont();
-	//	string GetText();
-	//	float GetSize();
-	//	Point2D GetPosition();
-	//
+
+	string GetFont();
+	string GetText();
+	float GetSize();
+	Point2D GetPosition();
 private:
 	string font;
 	string text;
 	float size;
 	Point2D position;
 };
-//
+
 class EllipseShape : public Figure
 {
 public:
@@ -93,13 +94,11 @@ public:
 
 	void SetElement(vector<string> data);
 	void clear();
-	//
-	//	void SetPoisition(Point2D position);
-	//	void SetMradius(Point2D m_radius);
-	//
-	//	Point2D GetPosition();
-	//	Point2D GetMradius();
-	//
+
+	Point2D GetPosition();
+	float GetWidth();
+	float GetHeight();
+
 private:
 	Point2D center;
 	float width, height;
@@ -114,9 +113,7 @@ public:
 	void SetElement(vector<string> data);
 	void clear();
 
-	/*void SetPosition(Point2D pt);
-
-	vector<Point2D> GetPosition();*/
+	vector<Point2D> GetPoints();
 
 private:
 	vector<Point2D> points;
@@ -181,15 +178,14 @@ public:
 	void readData(string filename);
 	Group readGroup(xml_node<>*, vector<string>);
 	void processData(vector<string> data, string tag);
-	/*void Draw(RenderWindow& window);
+	VOID Draw(HDC hdc);
 
-	void DrawPolygon(RenderWindow& window, Polygon shape);
-	void DrawWord(RenderWindow& window, Word shape);
-	void DrawEllipse(RenderWindow& window, Ellipse shape);
-	void DrawCircle(RenderWindow& window, Circle shape);
-	void DrawLine(RenderWindow& window, Polyline shape, Point2D p1, Point2D p2);
-	void DrawPolyline(RenderWindow& window, Polyline shape);
-	void DrawGroup(RenderWindow& window, Group shape);*/
+	VOID DrawPolygon(HDC hdc, PolygonShape shape);
+	VOID DrawText(HDC hdc, Text shape);
+	VOID DrawEllipse(HDC hdc, EllipseShape shape);
+	//void DrawLine(RenderWindow& window, Polyline shape, Point2D p1, Point2D p2);
+	VOID DrawPolyline(HDC hdc, PolylineShape shape);
+	VOID DrawGroup(HDC hdc, Group shape);
 
 private:
 	vector<PolygonShape> polygon;
@@ -201,5 +197,12 @@ private:
 
 	vector<int> shapeID;
 };
+
+Point2D FindIntersectionPoint2D(Point2D A, Point2D B, Point2D C, Point2D D);
+
+#include <locale>
+#include <codecvt>
+
+wstring String2Wstring(string s);
 
 #endif // !_SHAPE_H_

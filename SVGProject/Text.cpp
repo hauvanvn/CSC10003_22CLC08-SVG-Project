@@ -91,3 +91,23 @@ void Text::clear() {
 	size = 1;
 	position.x = position.y = 0;
 }
+
+string Text::GetFont()
+{
+	return this->font;
+}
+
+string Text::GetText()
+{
+	return this->text;
+}
+
+float Text::GetSize()
+{
+	return this->size;
+}
+
+Point2D Text::GetPosition()
+{
+	return this->position;
+}

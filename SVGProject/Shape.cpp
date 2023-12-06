@@ -2,35 +2,20 @@
 #include "Shape.h"
 ////////////////////////////// Figure \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-//void Figure::SetColor(RGBA color)
-//{
-//	this->color = color;
-//}
-//
-//void Figure::SetStrokeWidth(float width)
-//{
-//	this->stroke_width = width;
-//}
-//
-//void Figure::SetStrokeColor(RGBA color)
-//{
-//	this->stroke_color = color;
-//}
-//
-//RGBA Figure::GetColor()
-//{
-//	return this->color;
-//}
-//
-//float Figure::GetStrokeWidth()
-//{
-//	return this->stroke_width;
-//}
-//
-//RGBA Figure::GetStrokeColor()
-//{
-//	return this->stroke_color;
-//}
+RGBA Figure::GetFillColor()
+{
+	return this->fillColor;
+}
+
+RGBA Figure::GetStrokeColor()
+{
+	return this->strokeColor;
+}
+
+float Figure::GetStrokeWidth()
+{
+	return this->strokeWidth;
+}
 
 ///////////////////////// Drawer \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
@@ -194,3 +179,202 @@ void Drawer::readData(string filename)
 	}
 }
 
+VOID Drawer::Draw(HDC hdc)
+{
+	vector<int> index(6, 0);
+
+	for (int i : shapeID)
+	{
+		switch (i)
+		{
+		case 0:
+			DrawPolygon(hdc, polygon[index[i]++]);
+			break;
+
+		case 1:
+			DrawText(hdc, text[index[i]++]);
+			break;
+
+		case 2:
+			DrawEllipse(hdc, ellipse[index[i]++]);
+			break;
+
+		case 3:
+			DrawPolyline(hdc, polyline[index[i]++]);
+			break;
+
+		case 4:
+			//DrawPath(hdc, path[index[i]++]);
+			break;
+
+		case 5:
+			DrawGroup(hdc, group[index[i]++]);
+			break;
+
+		default:
+			break;
+		}
+	}
+}
+
+VOID Drawer::DrawPolygon(HDC hdc, PolygonShape shape)
+{
+	Graphics graphics(hdc);
+
+	Pen pen(Color(255, 255, 0, 0));
+	pen.SetWidth(shape.GetStrokeWidth());
+
+	SolidBrush brush(Color(255, 0, 255, 0));
+
+	vector<Point2D> p = shape.GetPoints();
+	if (p.size() > 1)
+	{
+		Point* pt = new Point[p.size()];
+		for (int i = 0; i < p.size(); ++i)
+		{
+			pt[i].X = p[i].x;
+			pt[i].Y = p[i].y;
+		}
+
+		graphics.FillPolygon(&brush, pt, p.size());
+		graphics.DrawPolygon(&pen, pt, p.size());
+
+		delete[] pt;
+	}
+	else
+	{
+		graphics.FillRectangle(&brush, p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
+		graphics.DrawRectangle(&pen, p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
+	}
+}
+
+VOID Drawer::DrawText(HDC hdc, Text shape)
+{
+	Graphics graphics(hdc);
+
+	//FontFamily fontFamily(String2Wstring(shape.GetFont()).c_str());
+	FontFamily fontFamily(L"Times New Roman");
+	Font font(&fontFamily, shape.GetSize(), FontStyleRegular, UnitPixel);
+	PointF point(shape.GetPosition().x, shape.GetPosition().y - shape.GetSize());
+	SolidBrush solidBrush(Color(255, 0, 0, 255));
+
+	graphics.DrawString(String2Wstring(shape.GetText()).c_str(), -1, &font, point, &solidBrush);
+}
+
+VOID Drawer::DrawEllipse(HDC hdc, EllipseShape shape)
+{
+	Graphics graphics(hdc);
+
+	Pen pen(Color(255, 0, 0, 255));
+	pen.SetWidth(shape.GetStrokeWidth());
+
+	SolidBrush brush(Color(255, 0, 100, 100));
+
+	RectF ellipseRect(shape.GetPosition().x - shape.GetWidth(), shape.GetPosition().y - shape.GetHeight(), shape.GetWidth() * 2, shape.GetHeight() * 2);
+
+	graphics.FillEllipse(&brush, ellipseRect);
+	graphics.DrawEllipse(&pen, ellipseRect);
+}
+
+VOID Drawer::DrawPolyline(HDC hdc, PolylineShape shape)
+{
+	Graphics graphics(hdc);
+
+	Pen pen(Color(255, 255, 0, 0));
+	pen.SetWidth(shape.GetStrokeWidth());
+
+	SolidBrush brush(Color(255, 0, 255, 0));
+
+	vector<Point2D> p = shape.GetPoints();
+	Point* pt = new Point[p.size()];
+	for (int i = 0; i < p.size(); ++i)
+	{
+		pt[i].X = p[i].x;
+		pt[i].Y = p[i].y;
+	}
+
+	graphics.FillPolygon(&brush, pt, p.size());
+	graphics.DrawLines(&pen, pt, p.size());
+
+	delete[] pt;
+}
+
+VOID Drawer::DrawGroup(HDC hdc, Group shape)
+{
+	Graphics graphics(hdc);
+
+	Pen pen(Color::Black);
+
+	vector<GraphicsPath> paths;
+
+	vector<int> index(6, 0);
+	for (int i : shapeID)
+	{
+		//switch (i)
+		//{
+		//case 0:
+		//	GraphicsPath polygonPath;
+		//	//if (polygon[index[i]].GetWidth() == -1)
+		//	//	polygonPath.AddRectangle()
+		//	DrawPolygon(hdc, polygon[index[i]++]);
+		//	break;
+
+		//case 1:
+		//	DrawText(hdc, text[index[i]++]);
+		//	break;
+
+		//case 2:
+		//	DrawEllipse(hdc, ellipse[index[i]++]);
+		//	break;
+
+		//case 3:
+		//	DrawPolyline(hdc, polyline[index[i]++]);
+		//	break;
+
+		//case 4:
+		//	//DrawPath(hdc, path[index[i]++]);
+		//	break;
+		//
+		//case 5:
+		//	DrawGroup(hdc, group[index[i]++]);
+		//	break;
+
+		//default:
+		//	break;
+		//}
+	}
+}
+
+//Point FindIntersectionPoint(Point A, Point B, Point C, Point D)
+//{
+//	float a1 = B.y - A.y;
+//	float b1 = A.x - B.x;
+//	float c1 = a1 * A.x + b1 * A.y;
+//
+//	float a2 = D.y - C.y;
+//	float b2 = C.x - D.x;
+//	float c2 = a2 * C.x + b2 * C.y;
+//
+//
+//	float determinant = a1 * b2 - a2 * b1;
+//
+//	if (determinant == 0)
+//	{
+//		return { -1, -1 };
+//	}
+//	else
+//	{
+//		float x = (b2 * c1 - b1 * c2) / determinant;
+//		float y = (a1 * c2 - a2 * c1) / determinant;
+//		{
+//			return { x, y };
+//		}
+//	}
+//}
+
+wstring String2Wstring(string s)
+{
+	wstring_convert<codecvt_utf8<wchar_t>> converter;
+	wstring wContent = converter.from_bytes(s);
+	return wContent;
+}

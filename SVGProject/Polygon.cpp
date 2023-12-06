@@ -118,3 +118,18 @@ void PolygonShape::clear() {
 	point.clear();
 	width = height = -1;
 }
+
+vector<Point2D> PolygonShape::GetPoints()
+{
+	return this->point;
+}
+
+float PolygonShape::GetWidth()
+{
+	return this->width;
+}
+
+float PolygonShape::GetHeight()
+{
+	return this->height;
+}

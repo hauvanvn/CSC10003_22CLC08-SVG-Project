@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "Shape.h"
 
-Path::Path() {}
+Path::Path() 
+{
+	fillColor.A = 0;
+}
 
 Path::~Path() {}
 
@@ -160,8 +163,13 @@ void Path::clear()
 	fillColor.color = strokeColor.color = "";
 	fillColor.R = fillColor.G = fillColor.B = 0;
 	strokeColor.R = strokeColor.G = strokeColor.B = 0;
-	fillColor.A = strokeColor.A = 1;
+	fillColor.A = 0; strokeColor.A = 1;
 	strokeWidth = 1;
 
 	Shapes.clear();
+}
+
+vector<PathShapes> Path::GetPathShapes()
+{
+	return this->Shapes;
 }

@@ -204,7 +204,7 @@ VOID Drawer::Draw(HDC hdc)
 			break;
 
 		case 5:
-			//DrawPath(hdc, path[index[i]++]);
+			DrawPath(hdc, path[index[i]++]);
 			break;
 
 		case 6:
@@ -304,6 +304,66 @@ VOID Drawer::DrawPolyline(HDC hdc, PolylineShape shape)
 	graphics.DrawLines(&pen, pt, p.size());
 
 	delete[] pt;
+}
+
+VOID Drawer::DrawPath(HDC hdc, Path shape)
+{
+	Graphics graphics(hdc);
+
+	RGBA color = shape.GetStrokeColor();
+	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
+	pen.SetWidth(shape.GetStrokeWidth());
+
+	color = shape.GetFillColor();
+	SolidBrush brush(Color(255 * color.A, color.R, color.G, color.B));
+
+	vector<PathShapes> pShape = shape.GetPathShapes();
+	GraphicsPath path;
+
+	PointF pre;
+	pre.X = pShape[0].points[0].x;
+	pre.Y = pShape[0].points[0].y;
+
+	for (int i = 0; i < pShape.size(); ++i)
+	{
+		int n = pShape[i].points.size();
+		PointF* pt = new PointF[n + 1];
+		pt[0] = pre;
+		for (int j = 1; j <= n; ++j)
+		{
+			pt[j].X = pShape[i].points[j - 1].x;
+			pt[j].Y = pShape[i].points[j - 1].y;
+		}
+
+		switch (pShape[i].type)
+		{
+		case 'M': case 'L':
+			path.AddLines(pt, n + 1);
+			break;
+		case 'H': case 'V':
+		{
+			for (int j = 1; j <= n; ++j)
+			{
+				if (pt[j].X == 0) pt[j].X = pt[j - 1].X;
+				if (pt[j].Y == 0) pt[j].Y = pt[j - 1].Y;
+			}
+
+			path.AddLines(pt, n + 1);
+			break;
+		}
+		case 'C':
+			path.AddBeziers(pt, n + 1);
+			break;
+		default:
+			break;
+		}
+
+		pre = pt[n];
+		delete[] pt;
+	}
+
+	graphics.FillPath(&brush, &path);
+	graphics.DrawPath(&pen, &path);
 }
 
 VOID Drawer::DrawGroup(HDC hdc, Group shape)

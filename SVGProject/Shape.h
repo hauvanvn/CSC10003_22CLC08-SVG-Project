@@ -133,6 +133,8 @@ public:
 	void SetElement(vector<string> data);
 	void clear();
 
+	vector<PathShapes> GetPathShapes();
+
 private:
 	vector<PathShapes> Shapes;
 };
@@ -185,6 +187,7 @@ public:
 	VOID DrawEllipse(HDC hdc, EllipseShape shape);
 	//void DrawLine(RenderWindow& window, Polyline shape, Point2D p1, Point2D p2);
 	VOID DrawPolyline(HDC hdc, PolylineShape shape);
+	VOID DrawPath(HDC hdc, Path shape);
 	VOID DrawGroup(HDC hdc, Group shape);
 
 private:

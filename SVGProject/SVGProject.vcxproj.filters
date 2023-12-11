@@ -28,6 +28,9 @@
     <ClCompile Include="Elipse.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Figure.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -67,10 +70,30 @@
     <Filter Include="Source">
       <UniqueIdentifier>{2cf8923c-89c9-491e-acd4-d8e054ff3088}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SVG">
+      <UniqueIdentifier>{1a208688-7462-471a-b631-22fb5f160e8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="SVGProject.rc">
       <Filter>Resoure</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SVGFolder\sample.svg">
+      <Filter>SVG</Filter>
+    </None>
+    <None Include="SVGFolder\svg-01.svg">
+      <Filter>SVG</Filter>
+    </None>
+    <None Include="SVGFolder\svg-02.svg">
+      <Filter>SVG</Filter>
+    </None>
+    <None Include="SVGFolder\svg-03.svg">
+      <Filter>SVG</Filter>
+    </None>
+    <None Include="SVGFolder\svg-06.svg">
+      <Filter>SVG</Filter>
+    </None>
   </ItemGroup>
 </Project>

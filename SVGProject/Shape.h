@@ -17,7 +17,7 @@ using namespace Gdiplus;
 #include <string>
 #include <sstream>
 #include <fstream>
-
+#include <utility>
 using namespace rapidxml;
 using namespace std;
 
@@ -38,14 +38,35 @@ public:
 	/*void SetColor(RGBA color);
 	void SetStrokeWidth(float width);
 	void SetStrokeColor(RGBA color);*/
+	Figure();
+	~Figure();
+
+	void readFigure(vector<string> data);
+
+	void AddTranslate(Point2D position);
+	void AddAngle(float angle);
+	void AddFillColor(RGBA newColor);
+	void AddStrokeColor(RGBA newColor);
+	void SetAnchor(Point2D anchor);
+	void SetScale(Point2D scale);
+	void Reset();
 
 	RGBA GetFillColor();
 	RGBA GetStrokeColor();
 	float GetStrokeWidth();
+	Point2D GetTranslate();
+	float GetAngle();
+	Point2D GetAnchor();
+	Point2D GetScale();
 
 protected:
 	RGBA fillColor, strokeColor;
-	float strokeWidth = 1;
+	float strokeWidth;
+
+	Point2D anchor;
+	Point2D translate;
+	float angle;
+	Point2D scale;
 };
 
 class PolygonShape : public Figure
@@ -155,12 +176,18 @@ public:
 	void setPolyline(vector<PolylineShape>);
 	void setPath(vector<Path>);
 	void setShapeID(vector<int>);
-private:
-	Point2D position;
-	Point2D anchor;
-	Point2D scale;
-	float rotation;
 
+	vector<Group> GetGroup();
+	vector<PolygonShape> GetPolygon();
+	vector<Text> GetText();
+	vector<EllipseShape> GetEllipse();
+	vector<PolylineShape> GetPolyline();
+	vector<Path> GetPath();
+	vector<int> GetShapeID();
+
+	void ApplyGroup2Child();
+
+private:
 	vector<Group> group;
 	vector<PolygonShape> polygon;
 	vector<Text> text;
@@ -185,7 +212,6 @@ public:
 	VOID DrawPolygon(HDC hdc, PolygonShape shape);
 	VOID DrawText(HDC hdc, Text shape);
 	VOID DrawEllipse(HDC hdc, EllipseShape shape);
-	//void DrawLine(RenderWindow& window, Polyline shape, Point2D p1, Point2D p2);
 	VOID DrawPolyline(HDC hdc, PolylineShape shape);
 	VOID DrawPath(HDC hdc, Path shape);
 	VOID DrawGroup(HDC hdc, Group shape);
@@ -200,8 +226,6 @@ private:
 
 	vector<int> shapeID;
 };
-
-Point2D FindIntersectionPoint2D(Point2D A, Point2D B, Point2D C, Point2D D);
 
 #include <locale>
 #include <codecvt>

@@ -1,23 +1,5 @@
 #include "stdafx.h"
 #include "Shape.h"
-////////////////////////////// Figure \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-RGBA Figure::GetFillColor()
-{
-	return this->fillColor;
-}
-
-RGBA Figure::GetStrokeColor()
-{
-	return this->strokeColor;
-}
-
-float Figure::GetStrokeWidth()
-{
-	return this->strokeWidth;
-}
-
-///////////////////////// Drawer \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 Drawer::Drawer() {}
 
@@ -86,6 +68,9 @@ Group Drawer::readGroup(xml_node<>* node, vector<string> data)
 	while (child != NULL)
 	{
 		string tag = child->name();
+		if (tag.compare("text") == 0)
+			collector.push_back(child->value());
+
 		attribute = child->first_attribute();
 		attributeName = attribute->name();
 		attributeValue = attribute->value();
@@ -106,6 +91,7 @@ Group Drawer::readGroup(xml_node<>* node, vector<string> data)
 		{
 			tempG = readGroup(child, collector);
 			result.setGroup(tempG);
+			drawer.shapeID.push_back(6);
 			tempG.clear();
 		}
 		else	drawer.processData(collector, tag);
@@ -181,7 +167,7 @@ void Drawer::readData(string filename)
 
 VOID Drawer::Draw(HDC hdc)
 {
-	vector<int> index(6, 0);
+	vector<int> index(7, 0);
 
 	for (int i : shapeID)
 	{
@@ -208,7 +194,7 @@ VOID Drawer::Draw(HDC hdc)
 			break;
 
 		case 6:
-			//DrawGroup(hdc, group[index[i]++]);
+			DrawGroup(hdc, group[index[i]++]);
 			break;
 
 		default:
@@ -220,6 +206,16 @@ VOID Drawer::Draw(HDC hdc)
 VOID Drawer::DrawPolygon(HDC hdc, PolygonShape shape)
 {
 	Graphics graphics(hdc);
+
+	Point2D translate = shape.GetTranslate();
+	Point2D anchor = shape.GetAnchor();
+	float rotation = shape.GetAngle();
+	Point2D scale = shape.GetScale();
+	Matrix tranform;
+	tranform.Translate(translate.x, translate.y);
+	tranform.Rotate(rotation);
+	tranform.Scale(scale.x, scale.y);
+	graphics.SetTransform(&tranform);
 
 	RGBA color = shape.GetStrokeColor();
 	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
@@ -254,6 +250,15 @@ VOID Drawer::DrawText(HDC hdc, Text shape)
 {
 	Graphics graphics(hdc);
 
+	Point2D translate = shape.GetTranslate();
+	float rotation = shape.GetAngle();
+	Point2D scale = shape.GetScale();
+	Matrix tranform;
+	tranform.Translate(translate.x, translate.y);
+	tranform.Rotate(rotation);
+	tranform.Scale(scale.x, scale.y);
+	graphics.SetTransform(&tranform);
+
 	RGBA color = shape.GetFillColor();
 
 	FontFamily fontFamily(String2Wstring(shape.GetFont()).c_str());
@@ -261,12 +266,31 @@ VOID Drawer::DrawText(HDC hdc, Text shape)
 	PointF point(shape.GetPosition().x, shape.GetPosition().y - shape.GetSize());
 	SolidBrush solidBrush(Color(255 * color.A, color.R, color.G, color.B));
 
+	color = shape.GetStrokeColor();
+	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
+	pen.SetWidth(shape.GetStrokeWidth());
+
 	graphics.DrawString(String2Wstring(shape.GetText()).c_str(), -1, &font, point, &solidBrush);
+
+	//tranform.Translate(-translate.x, -translate.y);
+	//tranform.Rotate(-rotation);
+	//tranform.Scale(-scale.x, -scale.y);
+	//graphics.SetTransform(&tranform);
 }
 
 VOID Drawer::DrawEllipse(HDC hdc, EllipseShape shape)
 {
 	Graphics graphics(hdc);
+
+	Point2D translate = shape.GetTranslate();
+	Point2D anchor = shape.GetAnchor();
+	float rotation = shape.GetAngle();
+	Point2D scale = shape.GetScale();
+	Matrix tranform;
+	tranform.Translate(translate.x, translate.y);
+	tranform.Rotate(rotation);
+	tranform.Scale(scale.x, scale.y);
+	graphics.SetTransform(&tranform);
 
 	RGBA color = shape.GetStrokeColor();
 	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
@@ -284,6 +308,16 @@ VOID Drawer::DrawEllipse(HDC hdc, EllipseShape shape)
 VOID Drawer::DrawPolyline(HDC hdc, PolylineShape shape)
 {
 	Graphics graphics(hdc);
+
+	Point2D translate = shape.GetTranslate();
+	Point2D anchor = shape.GetAnchor();
+	float rotation = shape.GetAngle();
+	Point2D scale = shape.GetScale();
+	Matrix tranform;
+	tranform.Translate(translate.x, translate.y);
+	tranform.Rotate(rotation);
+	tranform.Scale(scale.x, scale.y);
+	graphics.SetTransform(&tranform);
 
 	RGBA color = shape.GetStrokeColor();
 	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
@@ -309,6 +343,16 @@ VOID Drawer::DrawPolyline(HDC hdc, PolylineShape shape)
 VOID Drawer::DrawPath(HDC hdc, Path shape)
 {
 	Graphics graphics(hdc);
+
+	Point2D translate = shape.GetTranslate();
+	Point2D anchor = shape.GetAnchor();
+	float rotation = shape.GetAngle();
+	Point2D scale = shape.GetScale();
+	Matrix tranform;
+	tranform.Translate(translate.x, translate.y);
+	tranform.Rotate(rotation);
+	tranform.Scale(scale.x, scale.y);
+	graphics.SetTransform(&tranform);
 
 	RGBA color = shape.GetStrokeColor();
 	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
@@ -368,76 +412,49 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 
 VOID Drawer::DrawGroup(HDC hdc, Group shape)
 {
-	Graphics graphics(hdc);
+	shape.ApplyGroup2Child();
+	vector<int> index(7, 0);
+	vector<PolygonShape> polygon = shape.GetPolygon();
+	vector<Text> text = shape.GetText();
+	vector<EllipseShape> ellipse = shape.GetEllipse();
+	vector<PolylineShape> polyline = shape.GetPolyline();
+	vector<Path> path = shape.GetPath();
+	vector<Group> group = shape.GetGroup();
+	vector<int> shapeID = shape.GetShapeID();
 
-	Pen pen(Color::Black);
-
-	vector<GraphicsPath> paths;
-
-	vector<int> index(6, 0);
 	for (int i : shapeID)
 	{
-		//switch (i)
-		//{
-		//case 0:
-		//	GraphicsPath polygonPath;
-		//	//if (polygon[index[i]].GetWidth() == -1)
-		//	//	polygonPath.AddRectangle()
-		//	DrawPolygon(hdc, polygon[index[i]++]);
-		//	break;
+		switch (i)
+		{
+		case 1:
+			DrawPolygon(hdc, polygon[index[i]++]);
+			break;
 
-		//case 1:
-		//	DrawText(hdc, text[index[i]++]);
-		//	break;
+		case 2:
+			DrawText(hdc, text[index[i]++]);
+			break;
 
-		//case 2:
-		//	DrawEllipse(hdc, ellipse[index[i]++]);
-		//	break;
+		case 3:
+			DrawEllipse(hdc, ellipse[index[i]++]);
+			break;
 
-		//case 3:
-		//	DrawPolyline(hdc, polyline[index[i]++]);
-		//	break;
+		case 4:
+			DrawPolyline(hdc, polyline[index[i]++]);
+			break;
 
-		//case 4:
-		//	//DrawPath(hdc, path[index[i]++]);
-		//	break;
-		//
-		//case 5:
-		//	DrawGroup(hdc, group[index[i]++]);
-		//	break;
+		case 5:
+			DrawPath(hdc, path[index[i]++]);
+			break;
 
-		//default:
-		//	break;
-		//}
+		case 6:
+			DrawGroup(hdc, group[index[i]++]);
+			break;
+
+		default:
+			break;
+		}
 	}
 }
-
-//Point FindIntersectionPoint(Point A, Point B, Point C, Point D)
-//{
-//	float a1 = B.y - A.y;
-//	float b1 = A.x - B.x;
-//	float c1 = a1 * A.x + b1 * A.y;
-//
-//	float a2 = D.y - C.y;
-//	float b2 = C.x - D.x;
-//	float c2 = a2 * C.x + b2 * C.y;
-//
-//
-//	float determinant = a1 * b2 - a2 * b1;
-//
-//	if (determinant == 0)
-//	{
-//		return { -1, -1 };
-//	}
-//	else
-//	{
-//		float x = (b2 * c1 - b1 * c2) / determinant;
-//		float y = (a1 * c2 - a2 * c1) / determinant;
-//		{
-//			return { x, y };
-//		}
-//	}
-//}
 
 wstring String2Wstring(string s)
 {

@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Elipse.cpp" />
+    <ClCompile Include="Figure.cpp" />
     <ClCompile Include="Group.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="Polygon.cpp" />
@@ -177,6 +178,13 @@
   <ItemGroup>
     <Image Include="small.ico" />
     <Image Include="SVGProject.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SVGFolder\sample.svg" />
+    <None Include="SVGFolder\svg-01.svg" />
+    <None Include="SVGFolder\svg-02.svg" />
+    <None Include="SVGFolder\svg-03.svg" />
+    <None Include="SVGFolder\svg-06.svg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -32,6 +32,26 @@ struct RGBA
 	float R = 0, G = 0, B = 0, A = 1;
 };
 
+struct StopGradient {
+	RGBA stop_color;
+	float offset, opacity = 1;
+};
+
+class GradientColor {
+	string ID;
+	Point2D translate;
+	vector<Point2D> points;
+	vector<StopGradient> stops;
+
+public:
+	GradientColor();
+	~GradientColor();
+
+	void SetElement(vector<string>);
+	void clear();
+	void addStopGradient(StopGradient);
+};
+
 class Figure
 {
 public:
@@ -205,8 +225,10 @@ public:
 	~Drawer();
 
 	void readData(string filename);
+	void readGradient(xml_node<>*);
 	Group readGroup(xml_node<>*, vector<string>);
 	void processData(vector<string> data, string tag);
+	
 	VOID Draw(HDC hdc);
 
 	VOID DrawPolygon(HDC hdc, PolygonShape shape);
@@ -225,11 +247,14 @@ private:
 	vector<Path> path;
 
 	vector<int> shapeID;
+
+	vector<GradientColor> ListLinearGradient;
 };
 
 #include <locale>
 #include <codecvt>
 
 wstring String2Wstring(string s);
+RGBA Hex2RGBA(string data);
 
 #endif // !_SHAPE_H_

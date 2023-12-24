@@ -10,10 +10,10 @@ void PolylineShape::SetElement(vector<string> data)
 	Point2D secondPoint;
 	bool line = false;
 
+	readFigure(data);
+
 	for (int i = 0; i < data.size(); ++i)
 	{
-		readFigure(data);
-
 		//This part is postion of points making up a line
 		if (data[i].compare("x1") == 0 || data[i].compare("y1") == 0)
 		{

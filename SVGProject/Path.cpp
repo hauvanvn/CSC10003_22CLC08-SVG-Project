@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Shape.h"
 
-Path::Path() 
+Path::Path()
 {
 	fillColor.A = 0;
 }
@@ -10,19 +10,34 @@ Path::~Path() {}
 
 void Path::SetElement(vector<string> data)
 {
+	readFigure(data);
+
 	for (int i = 0; i < data.size(); ++i)
 	{
-		readFigure(data);
-
 		if (data[i].compare("d") == 0)
 		{
 			++i;
-			for (int j = 0; j < data[i].length(); ++j) //This removes coma from the string
-				if (data[i][j] == ',')
-					data[i][j] = ' ';
 
 			for (int j = 0; j < data[i].length(); ++j)
-				if ((data[i][j] < '0' || data[i][j] > '9') && data[i][j] != '.' && data[i][j] != '-' && data[i][j] != ' ' && data[i][j] != '\n')
+				if (data[i][j] == ',')			// Removes coma from the string
+					data[i][j] = ' ';
+				else if (data[i][j] == '-') //add ' ' pos '-'
+				{
+					data[i].insert(j, 1, ' ');
+					j++;
+				}
+				else if (data[i][j] == '.') //seperate float number
+					for (int k = j + 1; data[i][k] != ' ' && data[i][k] != '\n'; ++k)
+						if (data[i][k] == '.')
+						{
+							data[i].insert(k, 1, ' ');
+							k++;
+						}
+						else if (data[i][k] < '0' || data[i][k] > '9')
+							break;
+
+			for (int j = 0; j < data[i].length(); ++j)
+				if ((data[i][j] < '0' || data[i][j] > '9') && data[i][j] != '.' && data[i][j] != '-' && data[i][j] != ' ' && data[i][j] != '\n' && data[i][j] != 'e' && data[i][j] != 'E')
 				{
 					PathShapes shape;
 					shape.type = data[i][j];
@@ -41,7 +56,7 @@ void Path::SetElement(vector<string> data)
 					while (str >> getter) //count similar shapes
 					{
 						for (int k = 0; k < getter.length(); ++k)
-							if ((getter[k] < '0' || getter[k] > '9') && getter[k] != '-' && getter[k] != '.')
+							if ((getter[k] < '0' || getter[k] > '9') && getter[k] != '-' && getter[k] != '.' && data[i][j] != 'e' && data[i][j] != 'E')
 							{
 								if (k != 0) //seperate cases where the letter stuck between 2 number
 									count++;
@@ -54,18 +69,44 @@ void Path::SetElement(vector<string> data)
 					}
 
 					if (shape.type == 'M' || shape.type == 'm' || shape.type == 'L' || shape.type == 'l')
-						for(int k = 0; k < count / 2; ++k)
+					{
+						for (int k = 0; k < count / 2; ++k)
 							Shapes.push_back(shape);
+
+						if (count % 2 != 0) //When data give extra data that dont needed
+							break;
+					}
 					else if (shape.type == 'H' || shape.type == 'h' || shape.type == 'V' || shape.type == 'v')
 						for (int k = 0; k < count; ++k)
 							Shapes.push_back(shape);
 					else if (shape.type == 'C' || shape.type == 'c')
+					{
 						for (int k = 0; k < count / 6; ++k)
 							Shapes.push_back(shape);
-					else if(shape.type == 'Z' || shape.type == 'z')
+
+						if (count % 6 != 0)
+							break;
+					}
+					else if (shape.type == 'S' || shape.type == 's')
+					{
+						for (int k = 0; k < count / 4; ++k)
+							Shapes.push_back(shape);
+
+						if (count % 4 != 0)
+							break;
+					}
+					else if (shape.type == 'A' || shape.type == 'a')
+					{
+						for (int k = 0; k < count / 7; ++k)
+							Shapes.push_back(shape);
+
+						if (count % 7 != 0)
+							break;
+					}
+					else if (shape.type == 'Z' || shape.type == 'z')
 						Shapes.push_back(shape);
 				}
-					
+
 			stringstream str(data[i]);
 			string getter;
 			Point2D tempPoint;
@@ -103,6 +144,36 @@ void Path::SetElement(vector<string> data)
 						tempPoint.y = stof(getter);
 						Shapes[j].points.push_back(tempPoint);
 					}
+				else if (Shapes[j].type == 'S' || Shapes[j].type == 's')
+					for (int k = 0; k < 2; ++k)
+					{
+						str >> getter;
+						tempPoint.x = stof(getter);
+						str >> getter;
+						tempPoint.y = stof(getter);
+						Shapes[j].points.push_back(tempPoint);
+					}
+				else if (Shapes[j].type == 'A' || Shapes[j].type == 'a')
+				{
+					str >> getter;
+					tempPoint.x = stof(getter);
+					str >> getter;
+					tempPoint.y = stof(getter);
+					Shapes[j].points.push_back(tempPoint);
+
+					str >> getter;
+					tempPoint.x = stof(getter); //x-axis-rotation
+					Shapes[j].points.push_back(tempPoint);
+
+					for (int k = 0; k < 2; ++k)
+					{
+						str >> getter;
+						tempPoint.x = stof(getter);
+						str >> getter;
+						tempPoint.y = stof(getter);
+						Shapes[j].points.push_back(tempPoint);
+					}
+				}
 			}
 		}
 	}

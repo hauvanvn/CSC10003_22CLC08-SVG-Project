@@ -19,7 +19,7 @@ void Figure::readFigure(vector<string> data)
 	{
 		if (data[i].compare("fill") == 0)
 		{
-			size_t foundRGB = data[++i].find("rgb");
+ 			size_t foundRGB = data[++i].find("rgb");
 			if (foundRGB == string::npos)
 				if (data[i][0] != '#')
 					fillColor.color = data[i];
@@ -74,6 +74,56 @@ void Figure::readFigure(vector<string> data)
 			strokeColor.A = stof(data[++i]);
 		else if (data[i].compare("stroke-width") == 0)
 			strokeWidth = stof(data[++i]);
+
+		else if (data[i].compare("transform") == 0)
+		{
+			++i;  //go to the value of transform
+			for (int j = 0; j < data[i].length(); ++j)
+				if (data[i][j] == '(' || data[i][j] == ')' || data[i][j] == ',')
+					data[i][j] = ' ';
+
+			string getter;
+			vector<string> collector;
+
+			stringstream str(data[i]);
+			while (str >> getter)
+				collector.push_back(getter);
+
+			for (int j = 0; j < collector.size(); ++j)
+			{
+				if (collector[j].compare("translate") == 0)
+				{
+					translate.x = stof(collector[++j]);
+					translate.y = stof(collector[++j]);
+				}
+				else if (collector[j].compare("scale") == 0)
+				{
+					scale.x = stof(collector[++j]);
+					scale.y = stof(collector[++j]);
+				}
+				else if (collector[j].compare("rotate") == 0)
+				{
+					angle = stof(collector[++j]);
+
+					if (j + 1 != collector.size())
+					{
+						bool isNum = true;
+						for (int k = 0; k < collector[j + 1].length(); ++k)
+							if (collector[j + 1][k] < '0' || collector[j + 1][k] > '9')
+							{
+								isNum = false;
+								break;
+							}
+
+						if (isNum) //This is when rotate has cx, cy
+						{
+							anchor.x = stof(collector[++j]);
+							anchor.y = stof(collector[++j]);
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -153,6 +203,16 @@ Point2D Figure::GetScale()
 
 RGBA Hex2RGBA(string data)
 {
+	if (data.length() < 7)
+	{
+		string temp = "#";
+		temp = temp + data[1] + data[1];
+		temp = temp + data[2] + data[2];
+		temp = temp + data[3] + data[3];
+
+		data = temp;
+	}
+
 	RGBA color;
 	float hex = 0;
 
@@ -160,7 +220,7 @@ RGBA Hex2RGBA(string data)
 	{
 		switch (data[i])
 		{
-		case 0: hex = 0;
+		case '0': hex = 0;
 			break;
 		case '1': hex = 1;
 			break;
@@ -180,28 +240,28 @@ RGBA Hex2RGBA(string data)
 			break;
 		case '9': hex = 9;
 			break;
-		case 'A': hex = 10;
+		case 'A': case 'a': hex = 10;
 			break;
-		case 'B': hex = 11;
+		case 'B': case 'b': hex = 11;
 			break;
-		case 'C': hex = 12;
+		case 'C': case 'c': hex = 12;
 			break;
-		case 'D': hex = 13;
+		case 'D': case 'd': hex = 13;
 			break;
-		case 'E': hex = 14;
+		case 'E': case 'e': hex = 14;
 			break;
-		case 'F': hex = 15;
+		case 'F': case 'f': hex = 15;
 			break;
 		}
 
 		if (i <= 2)
-			if (i == 2)		color.R += hex * 16;
+			if (i == 1)		color.R += hex * 16;
 			else			color.R += hex;
-		else if(i <= 4)
-			if (i == 4)		color.G += hex * 16;
+		else if (i <= 4)
+			if (i == 3)		color.G += hex * 16;
 			else			color.G += hex;
-		else 
-			if (i == 6)		color.B += hex * 16;
+		else
+			if (i == 5)		color.B += hex * 16;
 			else			color.B += hex;
 	}
 

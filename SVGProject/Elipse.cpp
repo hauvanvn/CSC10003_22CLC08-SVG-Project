@@ -11,10 +11,10 @@ EllipseShape::~EllipseShape() {}
 
 void EllipseShape::SetElement(vector<string> data)
 {
+	readFigure(data);
+
 	for (int i = 0; i < data.size(); ++i)
 	{
-		readFigure(data);
-
 		if (data[i].compare("cx") == 0)
 			center.x = stof(data[++i]);
 		else if (data[i].compare("cy") == 0)

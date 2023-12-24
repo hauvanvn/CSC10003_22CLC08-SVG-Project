@@ -16,10 +16,10 @@ void Text::SetElement(vector<string> data)
 	while (words >> getter)
 		text += getter + " ";
 
+	readFigure(data);
+
 	for (int i = 1; i < data.size(); ++i)
 	{
-		readFigure(data);
-
 		if (data[i].compare("font-family") == 0)
 			font = data[++i];
 		else if (data[i].compare("font-size") == 0)

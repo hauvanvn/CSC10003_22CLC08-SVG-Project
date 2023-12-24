@@ -10,10 +10,10 @@ PolygonShape::~PolygonShape() {};
 
 void PolygonShape::SetElement(vector<string> data)
 {
+	readFigure(data);
+
 	for (int i = 0; i < data.size(); ++i)
 	{
-		readFigure(data);
-
 		if (data[i].compare("width") == 0)
 			width = stof(data[++i]);
 		else if (data[i].compare("height") == 0)

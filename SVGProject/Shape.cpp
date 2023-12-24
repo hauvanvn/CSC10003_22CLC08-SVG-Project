@@ -5,6 +5,118 @@ Drawer::Drawer() {}
 
 Drawer::~Drawer() {}
 
+void Drawer::readGradient(xml_node<>* root)
+{
+	xml_node<>* node = root->first_node();
+
+	string nodeName;
+	
+	xml_attribute<>* attribute;
+	string attributeName;
+	string attributeValue;
+	vector<string> collector;
+
+	GradientColor gradient;
+
+	while(node != NULL)
+	{
+		nodeName = node->name();
+		if (nodeName.compare("linearGradient") != 0)
+		{
+			node = node->next_sibling();
+			continue;
+		}
+
+		attribute = node->first_attribute();
+		attributeName = attribute->name();
+		attributeValue = attribute->value();
+
+		collector.push_back(attributeName);
+		collector.push_back(attributeValue);
+
+		while (attribute != node->last_attribute())
+		{
+			attribute = attribute->next_attribute();
+			attributeName = attribute->name();
+			attributeValue = attribute->value();
+
+			collector.push_back(attributeName);
+			collector.push_back(attributeValue);
+		}
+
+		gradient.SetElement(collector);
+		
+		collector.clear();
+
+		StopGradient stopG;
+		xml_node<>* child = node->first_node();
+
+		while (child != NULL)
+		{
+			attribute = child->first_attribute();
+			attributeName = attribute->name();
+			attributeValue = attribute->value();
+
+			collector.push_back(attributeName);
+			collector.push_back(attributeValue);
+
+			while (attribute != child->last_attribute())
+			{
+				attribute = attribute->next_attribute();
+				attributeName = attribute->name();
+				attributeValue = attribute->value();
+
+				collector.push_back(attributeName);
+				collector.push_back(attributeValue);
+			}
+
+			for (int i = 0; i < collector.size(); ++i)
+			{
+				if (collector[i].compare("stop-color") == 0)
+				{
+					size_t foundRGB = collector[++i].find("rgb");
+					if (foundRGB == string::npos)
+						if (collector[i][0] != '#')
+							stopG.stop_color.color = collector[i];
+						else
+							stopG.stop_color = Hex2RGBA(collector[i]);
+					else
+					{
+						for (int j = 0; j < collector[i].length(); ++j)
+							if ((collector[i][j] < '0' || collector[i][j] > '9') && collector[i][j] != '.' && collector[i][j] != '-')
+								collector[i][j] = ' ';
+
+						stringstream str(collector[i]);
+						string getter;
+
+						str >> getter;
+						stopG.stop_color.R = stof(getter);
+						str >> getter;
+						stopG.stop_color.G = stof(getter);
+						str >> getter;
+						stopG.stop_color.B = stof(getter);
+					}
+				}
+				else if (collector[i].compare("offset") == 0)
+					stopG.offset = stof(collector[++i]);
+				else if (collector[i].compare("stop-opacity") == 0)
+					stopG.opacity = stof(collector[++i]);
+			}
+
+			gradient.addStopGradient(stopG);
+			stopG.opacity = 1;
+
+			collector.clear();
+			child = child->next_sibling();
+		}
+
+		ListLinearGradient.push_back(gradient);
+
+		gradient.clear();
+		node = node->next_sibling();
+	}
+}
+
 void Drawer::processData(vector<string> collector, string tag)
 {
 	PolygonShape tempP;		//temp object to hold data
@@ -72,6 +184,20 @@ Group Drawer::readGroup(xml_node<>* node, vector<string> data)
 			collector.push_back(child->value());
 
 		attribute = child->first_attribute();
+		if (attribute == NULL)
+		{
+			if(tag.compare("g") == 0)
+			{
+				tempG = readGroup(child, collector);
+				result.setGroup(tempG);
+				drawer.shapeID.push_back(6);
+				tempG.clear();
+			}
+
+			child = child->next_sibling();
+			continue;
+		}
+
 		attributeName = attribute->name();
 		attributeValue = attribute->value();
 
@@ -123,6 +249,13 @@ void Drawer::readData(string filename)
 	doc.parse<0>(&buffer[0]);
 
 	rootNode = doc.first_node();
+
+	string nodeName = rootNode->name();
+	while (nodeName.compare("svg") != 0)
+	{
+		rootNode = rootNode->next_sibling();
+		nodeName = rootNode->name();
+	}
 	xml_node<>* node = rootNode->first_node();
 
 	vector<string> collector;
@@ -130,12 +263,28 @@ void Drawer::readData(string filename)
 	string attributeName;
 	string attributeValue;
 
-	while (node != NULL) {
-		string nodeName = node->name();
+	while (node != NULL)
+	{
+		nodeName = node->name();
 		if (nodeName.compare("text") == 0)
 			collector.push_back(node->value());
 
 		attribute = node->first_attribute();
+		if (attribute == NULL)
+		{
+			if (nodeName.compare("g") == 0)
+			{
+				Group tempG = readGroup(node, collector);
+				group.push_back(tempG);
+				shapeID.push_back(6);
+				tempG.clear();
+			}
+			else if (nodeName.compare("defs") == 0)		readGradient(node);
+
+			node = node->next_sibling();
+			continue;
+		}
+
 		attributeName = attribute->name();
 		attributeValue = attribute->value();
 
@@ -234,14 +383,14 @@ VOID Drawer::DrawPolygon(HDC hdc, PolygonShape shape)
 			pt[i].Y = p[i].y;
 		}
 
-		graphics.FillPolygon(&brush, pt, p.size());
+		if (color.color != "none") graphics.FillPolygon(&brush, pt, p.size());
 		graphics.DrawPolygon(&pen, pt, p.size());
 
 		delete[] pt;
 	}
 	else
 	{
-		graphics.FillRectangle(&brush, p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
+		if (color.color != "none") graphics.FillRectangle(&brush, p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
 		graphics.DrawRectangle(&pen, p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
 	}
 }
@@ -334,7 +483,7 @@ VOID Drawer::DrawPolyline(HDC hdc, PolylineShape shape)
 		pt[i].Y = p[i].y;
 	}
 
-	graphics.FillPolygon(&brush, pt, p.size());
+	if (color.color != "none") graphics.FillPolygon(&brush, pt, p.size());
 	graphics.DrawLines(&pen, pt, p.size());
 
 	delete[] pt;

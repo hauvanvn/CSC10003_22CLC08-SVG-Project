@@ -13,60 +13,61 @@ Group::~Group() {}
 
 void Group::SetElement(vector<string> data)
 {
-	for (int i = 0; i < data.size(); ++i)
-	{
-		readFigure(data);
+	readFigure(data);
+	//for (int i = 0; i < data.size(); ++i)
+	//{
+	//	
 
-		if (data[i].compare("transform") == 0)
-		{
-			++i;  //go to the value of transform
-			for (int j = 0; j < data[i].length(); ++j)
-				if (data[i][j] == '(' || data[i][j] == ')' || data[i][j] == ',')
-					data[i][j] = ' ';
+	//	//if (data[i].compare("transform") == 0)
+	//	//{
+	//	//	++i;  //go to the value of transform
+	//	//	for (int j = 0; j < data[i].length(); ++j)
+	//	//		if (data[i][j] == '(' || data[i][j] == ')' || data[i][j] == ',')
+	//	//			data[i][j] = ' ';
 
-			string getter;
-			vector<string> collector;
+	//	//	string getter;
+	//	//	vector<string> collector;
 
-			stringstream str(data[i]);
-			while (str >> getter)
-				collector.push_back(getter);
+	//	//	stringstream str(data[i]);
+	//	//	while (str >> getter)
+	//	//		collector.push_back(getter);
 
-			for (int j = 0; j < collector.size(); ++j)
-			{
-				if (collector[j].compare("translate") == 0)
-				{
-					translate.x = stof(collector[++j]);
-					translate.y = stof(collector[++j]);
-				}
-				else if (collector[j].compare("scale") == 0)
-				{
-					scale.x = stof(collector[++j]);
-					scale.y = stof(collector[++j]);
-				}
-				else if (collector[j].compare("rotate") == 0)
-				{
-					angle = stof(collector[++j]);
+	//	//	for (int j = 0; j < collector.size(); ++j)
+	//	//	{
+	//	//		if (collector[j].compare("translate") == 0)
+	//	//		{
+	//	//			translate.x = stof(collector[++j]);
+	//	//			translate.y = stof(collector[++j]);
+	//	//		}
+	//	//		else if (collector[j].compare("scale") == 0)
+	//	//		{
+	//	//			scale.x = stof(collector[++j]);
+	//	//			scale.y = stof(collector[++j]);
+	//	//		}
+	//	//		else if (collector[j].compare("rotate") == 0)
+	//	//		{
+	//	//			angle = stof(collector[++j]);
 
-					if (j + 1 != collector.size())
-					{
-						bool isNum = true;
-						for (int k = 0; k < collector[j + 1].length(); ++k)
-							if (collector[j + 1][k] < '0' || collector[j + 1][k] > '9')
-							{
-								isNum = false;
-								break;
-							}
+	//	//			if (j + 1 != collector.size())
+	//	//			{
+	//	//				bool isNum = true;
+	//	//				for (int k = 0; k < collector[j + 1].length(); ++k)
+	//	//					if (collector[j + 1][k] < '0' || collector[j + 1][k] > '9')
+	//	//					{
+	//	//						isNum = false;
+	//	//						break;
+	//	//					}
 
-						if (isNum) //This is when rotate has cx, cy
-						{
-							anchor.x = stof(collector[++j]);
-							anchor.y = stof(collector[++j]);
-						}
-					}
-				}
-			}
-		}
-	}
+	//	//				if (isNum) //This is when rotate has cx, cy
+	//	//				{
+	//	//					anchor.x = stof(collector[++j]);
+	//	//					anchor.y = stof(collector[++j]);
+	//	//				}
+	//	//			}
+	//	//		}
+	//	//	}
+	//	//}
+	//}
 
 
 }

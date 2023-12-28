@@ -513,45 +513,173 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 	vector<PathShapes> pShape = shape.GetPathShapes();
 	GraphicsPath path;
 
-	PointF pre;
-	pre.X = pShape[0].points[0].x;
-	pre.Y = pShape[0].points[0].y;
+	PointF pre, first;
+	first.X = pShape[0].points[0].x;
+	first.Y = pShape[0].points[0].y;
+	pre = first;
+	bool newPath = true;
 
 	for (int i = 0; i < pShape.size(); ++i)
 	{
 		int n = pShape[i].points.size();
-		PointF* pt = new PointF[n + 1];
-		pt[0] = pre;
-		for (int j = 1; j <= n; ++j)
+		PointF* pt = new PointF[n];
+		for (int j = 0; j < n; ++j)
 		{
-			pt[j].X = pShape[i].points[j - 1].x;
-			pt[j].Y = pShape[i].points[j - 1].y;
+			pt[j].X = pShape[i].points[j].x;
+			pt[j].Y = pShape[i].points[j].y;
 		}
 
 		switch (pShape[i].type)
 		{
-		case 'M': case 'L':
-			path.AddLines(pt, n + 1);
-			break;
-		case 'H': case 'V':
+		case 'M': case 'm':
 		{
-			for (int j = 1; j <= n; ++j)
+			if (pShape[i].type == 'm')
 			{
-				if (pt[j].X == 0) pt[j].X = pt[j - 1].X;
-				if (pt[j].Y == 0) pt[j].Y = pt[j - 1].Y;
+				pre.X += pt[0].X;
+				pre.Y += pt[0].Y;
 			}
-
-			path.AddLines(pt, n + 1);
+			else pre = pt[n - 1];
 			break;
 		}
-		case 'C':
-			path.AddBeziers(pt, n + 1);
+
+		case 'L':
+			path.AddLine(pre, pt[0]);
+			pre = pt[n - 1];
 			break;
+
+		case 'H': case 'V':
+		{
+			if (pt[0].X == 0) pt[0].X = pre.X;
+			if (pt[0].Y == 0) pt[0].Y = pre.Y;
+
+			path.AddLine(pre, pt[0]);
+			pre = pt[n - 1];
+			break;
+		}
+
+		case 'l': case 'h': case 'v':
+		{
+			PointF newPoint = pre;
+			newPoint.X += pt[0].X;
+			newPoint.Y += pt[0].Y;
+			path.AddLine(pre, newPoint);
+			pre = newPoint;
+			break;
+		}
+
+		case 'C': case 'c':
+		{
+			if (pShape[i].type == 'c')
+				for (int j = 0; j < 3; ++j)
+				{
+					pt[j].X += pre.X;
+					pt[j].Y += pre.Y;
+
+					pShape[i].points[j].x += pre.X;
+					pShape[i].points[j].y += pre.Y;
+				}
+
+			path.AddBezier(pre, pt[0], pt[1], pt[2]);
+			pre = pt[n - 1];
+			break;
+		}
+
+		case 'S': case 's':
+		{
+			PointF controlP = pre;
+
+			if (pShape[i].type == 's')
+				for (int j = 0; j < 2; ++j)
+				{
+					pt[j].X += pre.X;
+					pt[j].Y += pre.Y;
+
+					pShape[i].points[j].x += pre.X;
+					pShape[i].points[j].y += pre.Y;
+				}
+			if (i > 0 && (pShape[i - 1].type == 'S' || pShape[i - 1].type == 's' || pShape[i - 1].type == 'C' || pShape[i - 1].type == 'c'))
+			{
+				PointF oldControlP;
+				if (pShape[i - 1].points.size() == 3)
+				{
+					oldControlP.X = pShape[i - 1].points[1].x;
+					oldControlP.Y = pShape[i - 1].points[1].y;
+				}
+				else
+				{
+					oldControlP.X = pShape[i - 1].points[0].x;
+					oldControlP.Y = pShape[i - 1].points[0].y;
+				}
+				controlP.X = 2 * pre.X - oldControlP.X;
+				controlP.Y = 2 * pre.Y - oldControlP.Y;
+			}
+
+			path.AddBezier(pre, controlP, pt[0], pt[1]);
+			pre = pt[n - 1];
+			break;
+		}
+
+		case 'Q': case 'q':
+		{
+			if (pShape[i].type == 'q')
+				for (int j = 0; j < 2; ++j)
+				{
+					pt[j].X += pre.X;
+					pt[j].Y += pre.Y;
+
+					pShape[i].points[j].x += pre.X;
+					pShape[i].points[j].y += pre.Y;
+				}
+
+			path.AddBezier(pre, pt[0], pt[1], pt[1]);
+			pre = pt[n - 1];
+			break;
+		}
+
+		case 'T': case 't':
+		{
+			PointF controlP = pre;
+			PointF oldControlP;
+
+			if (pShape[i].type == 't')
+			{
+				pt[0].X += pre.X;
+				pt[0].Y += pre.Y;
+			}
+
+			if (i > 0 && (pShape[i - 1].type == 'T' || pShape[i - 1].type == 't' || pShape[i - 1].type == 'Q' || pShape[i - 1].type == 'q'))
+			{
+				oldControlP.X = pShape[i - 1].points[0].x;
+				oldControlP.Y = pShape[i - 1].points[0].y;
+
+				controlP.X = 2 * pre.X - oldControlP.X;
+				controlP.Y = 2 * pre.Y - oldControlP.Y;
+			}
+
+			path.AddBezier(pre, controlP, pt[0], pt[0]);
+			pre = pt[n - 1];
+
+			pt[0].X = oldControlP.X;
+			pt[0].Y = oldControlP.Y;
+			break;
+		}
+
+		case 'A': case 'a':
+		{
+			break;
+		}
+
+		case 'Z': case 'z':
+		{
+			path.AddLine(pre, first);
+			pre = first;
+			break;
+		}
+
 		default:
 			break;
 		}
 
-		pre = pt[n];
 		delete[] pt;
 	}
 

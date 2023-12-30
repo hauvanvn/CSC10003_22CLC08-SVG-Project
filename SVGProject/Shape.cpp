@@ -117,6 +117,13 @@ void Drawer::readGradient(xml_node<>* root)
 	}
 }
 
+GradientColor Drawer::GetGradient(string ID)
+{
+	for (int i = 0; i < ListLinearGradient.size(); ++i)
+		if (ID == ListLinearGradient[i].GetID())
+			return ListLinearGradient[i];
+}
+
 void Drawer::processData(vector<string> collector, string tag)
 {
 	PolygonShape tempP;		//temp object to hold data
@@ -356,24 +363,12 @@ VOID Drawer::DrawPolygon(HDC hdc, PolygonShape shape)
 {
 	Graphics graphics(hdc);
 
-	Point2D translate = shape.GetTranslate();
-	Point2D anchor = shape.GetAnchor();
-	float rotation = shape.GetAngle();
-	Point2D scale = shape.GetScale();
-	Matrix tranform;
-	tranform.Translate(translate.x, translate.y);
-	tranform.Rotate(rotation);
-	tranform.Scale(scale.x, scale.y);
-	graphics.SetTransform(&tranform);
+	graphics.SetTransform(shape.GetTransform());
 
-	RGBA color = shape.GetStrokeColor();
-	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
-	pen.SetWidth(shape.GetStrokeWidth());
-
-	color = shape.GetFillColor();
-	SolidBrush brush(Color(255 * color.A, color.R, color.G, color.B));
+	RGBA color = shape.GetFillColor();
 
 	vector<Point2D> p = shape.GetPoints();
+	string id = getGradientId(color.color);
 	if (p.size() > 1)
 	{
 		Point* pt = new Point[p.size()];
@@ -383,15 +378,23 @@ VOID Drawer::DrawPolygon(HDC hdc, PolygonShape shape)
 			pt[i].Y = p[i].y;
 		}
 
-		if (color.color != "none") graphics.FillPolygon(&brush, pt, p.size());
-		graphics.DrawPolygon(&pen, pt, p.size());
+		if (id != "")
+			graphics.FillPolygon(shape.GetLinearGradient(GetGradient(id)), pt, p.size());
+		else 
+			if (color.color != "none") 
+				graphics.FillPolygon(shape.GetFill(), pt, p.size());
+		graphics.DrawPolygon(shape.GetStroke(), pt, p.size());
 
 		delete[] pt;
 	}
 	else
 	{
-		if (color.color != "none") graphics.FillRectangle(&brush, p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
-		graphics.DrawRectangle(&pen, p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
+		if (id != "")
+			graphics.FillRectangle(shape.GetLinearGradient(GetGradient(id)), p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
+		else
+			if (color.color != "none")
+				graphics.FillRectangle(shape.GetFill(), p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
+		graphics.DrawRectangle(shape.GetStroke(), p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
 	}
 }
 
@@ -399,82 +402,47 @@ VOID Drawer::DrawText(HDC hdc, Text shape)
 {
 	Graphics graphics(hdc);
 
-	Point2D translate = shape.GetTranslate();
-	float rotation = shape.GetAngle();
-	Point2D scale = shape.GetScale();
-	Matrix tranform;
-	tranform.Translate(translate.x, translate.y);
-	tranform.Rotate(rotation);
-	tranform.Scale(scale.x, scale.y);
-	graphics.SetTransform(&tranform);
+	graphics.SetTransform(shape.GetTransform());
 
 	RGBA color = shape.GetFillColor();
 
 	FontFamily fontFamily(String2Wstring(shape.GetFont()).c_str());
 	Font font(&fontFamily, shape.GetSize(), FontStyleRegular, UnitPixel);
 	PointF point(shape.GetPosition().x, shape.GetPosition().y - shape.GetSize());
-	SolidBrush solidBrush(Color(255 * color.A, color.R, color.G, color.B));
 
-	color = shape.GetStrokeColor();
-	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
-	pen.SetWidth(shape.GetStrokeWidth());
-
-	graphics.DrawString(String2Wstring(shape.GetText()).c_str(), -1, &font, point, &solidBrush);
-
-	//tranform.Translate(-translate.x, -translate.y);
-	//tranform.Rotate(-rotation);
-	//tranform.Scale(-scale.x, -scale.y);
-	//graphics.SetTransform(&tranform);
+	string id = getGradientId(color.color);
+	if (id != "")
+		graphics.DrawString(String2Wstring(shape.GetText()).c_str(), -1, &font, point, shape.GetLinearGradient(GetGradient(id)));
+	else
+		if (color.color != "none")
+			graphics.DrawString(String2Wstring(shape.GetText()).c_str(), -1, &font, point, shape.GetFill());
 }
 
 VOID Drawer::DrawEllipse(HDC hdc, EllipseShape shape)
 {
 	Graphics graphics(hdc);
 
-	Point2D translate = shape.GetTranslate();
-	Point2D anchor = shape.GetAnchor();
-	float rotation = shape.GetAngle();
-	Point2D scale = shape.GetScale();
-	Matrix tranform;
-	tranform.Translate(translate.x, translate.y);
-	tranform.Rotate(rotation);
-	tranform.Scale(scale.x, scale.y);
-	graphics.SetTransform(&tranform);
-
-	RGBA color = shape.GetStrokeColor();
-	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
-	pen.SetWidth(shape.GetStrokeWidth());
-
-	color = shape.GetFillColor();
-	SolidBrush brush(Color(255 * color.A, color.R, color.G, color.B));
-
+	graphics.SetTransform(shape.GetTransform());
+	
 	RectF ellipseRect(shape.GetPosition().x - shape.GetWidth(), shape.GetPosition().y - shape.GetHeight(), shape.GetWidth() * 2, shape.GetHeight() * 2);
 
-	graphics.FillEllipse(&brush, ellipseRect);
-	graphics.DrawEllipse(&pen, ellipseRect);
+	RGBA color = shape.GetFillColor();
+	string id = getGradientId(color.color);
+	if (id != "")
+		graphics.FillEllipse(shape.GetLinearGradient(GetGradient(id)), ellipseRect);
+	else
+		if (color.color != "none")
+			graphics.FillEllipse(shape.GetFill(), ellipseRect);
+	graphics.DrawEllipse(shape.GetStroke(), ellipseRect);
 }
 
 VOID Drawer::DrawPolyline(HDC hdc, PolylineShape shape)
 {
 	Graphics graphics(hdc);
 
-	Point2D translate = shape.GetTranslate();
-	Point2D anchor = shape.GetAnchor();
-	float rotation = shape.GetAngle();
-	Point2D scale = shape.GetScale();
-	Matrix tranform;
-	tranform.Translate(translate.x, translate.y);
-	tranform.Rotate(rotation);
-	tranform.Scale(scale.x, scale.y);
-	graphics.SetTransform(&tranform);
+	graphics.SetTransform(shape.GetTransform());
 
-	RGBA color = shape.GetStrokeColor();
-	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
-	pen.SetWidth(shape.GetStrokeWidth());
-
-	color = shape.GetFillColor();
-	SolidBrush brush(Color(255 * color.A, color.R, color.G, color.B));
-
+	RGBA color = shape.GetFillColor();
 	vector<Point2D> p = shape.GetPoints();
 	Point* pt = new Point[p.size()];
 	for (int i = 0; i < p.size(); ++i)
@@ -483,8 +451,13 @@ VOID Drawer::DrawPolyline(HDC hdc, PolylineShape shape)
 		pt[i].Y = p[i].y;
 	}
 
-	if (color.color != "none") graphics.FillPolygon(&brush, pt, p.size());
-	graphics.DrawLines(&pen, pt, p.size());
+	string id = getGradientId(color.color);
+	if (id != "") 
+		graphics.FillPolygon(shape.GetLinearGradient(GetGradient(id)), pt, p.size());
+	else
+		if (color.color != "none") 
+			graphics.FillPolygon(shape.GetFill(), pt, p.size());
+	graphics.DrawLines(shape.GetStroke(), pt, p.size());
 
 	delete[] pt;
 }
@@ -493,23 +466,9 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 {
 	Graphics graphics(hdc);
 
-	Point2D translate = shape.GetTranslate();
-	Point2D anchor = shape.GetAnchor();
-	float rotation = shape.GetAngle();
-	Point2D scale = shape.GetScale();
-	Matrix tranform;
-	tranform.Translate(translate.x, translate.y);
-	tranform.Rotate(rotation);
-	tranform.Scale(scale.x, scale.y);
-	graphics.SetTransform(&tranform);
+	graphics.SetTransform(shape.GetTransform());
 
-	RGBA color = shape.GetStrokeColor();
-	Pen pen(Color(255 * color.A, color.R, color.G, color.B));
-	pen.SetWidth(shape.GetStrokeWidth());
-
-	color = shape.GetFillColor();
-	SolidBrush brush(Color(255 * color.A, color.R, color.G, color.B));
-
+	RGBA color = shape.GetFillColor();
 	vector<PathShapes> pShape = shape.GetPathShapes();
 	GraphicsPath path;
 
@@ -666,6 +625,63 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 
 		case 'A': case 'a':
 		{
+			if (pShape[i].type == 'a')
+			{
+				pt[3].X += pre.X;
+				pt[3].Y += pre.Y;
+			}
+
+			float cosAngle = cos(pt[1].X);
+			float sinAngle = sin(pt[1].X);
+
+			PointF point1;
+			point1.X = cosAngle * (pre.X - pt[3].X) / 2 + sinAngle * (pre.Y - pt[3].Y) / 2;
+			point1.Y = -sinAngle * (pre.X - pt[3].X) / 2 + cosAngle * (pre.Y - pt[3].Y) / 2;
+
+			float radiiCheck = (point1.X * point1.X) / (pt[0].X * pt[0].X) + (point1.Y * point1.Y) / (pt[0].Y * pt[0].Y);
+			if (radiiCheck > 1.0f)
+			{
+				pt[0].X = sqrt(radiiCheck) * pt[0].X;
+				pt[0].Y = sqrt(radiiCheck) * pt[0].Y;
+			}
+
+			PointF centerTemp;
+			float sign = 1; //positive
+			if (pt[2].X == pt[2].Y)	sign = -1;
+
+			centerTemp.X = sign * sqrt(abs(((pt[0].X * pt[0].X * pt[0].Y * pt[0].Y) - (pt[0].X * pt[0].X * point1.Y * point1.Y) - (point1.X * point1.X * pt[0].Y * pt[0].Y)) / ((pt[0].X * pt[0].X * point1.Y * point1.Y) + (point1.X * point1.X * pt[0].Y * pt[0].Y)))) * (pt[0].X * point1.Y / pt[0].Y);
+			centerTemp.Y = sign * sqrt(abs(((pt[0].X * pt[0].X * pt[0].Y * pt[0].Y) - (pt[0].X * pt[0].X * point1.Y * point1.Y) - (point1.X * point1.X * pt[0].Y * pt[0].Y)) / ((pt[0].X * pt[0].X * point1.Y * point1.Y) + (point1.X * point1.X * pt[0].Y * pt[0].Y)))) * (-pt[0].Y * point1.X / pt[0].X);
+
+			PointF center;
+			center.X = (cosAngle * centerTemp.X - sinAngle * +centerTemp.Y) + (pre.X + pt[3].X) / 2;
+			center.Y = (sinAngle * centerTemp.X + cosAngle * +centerTemp.Y) + (pre.Y + pt[3].Y) / 2;
+
+			float pi = atan(1) * 4;
+			PointF startPoint;
+			startPoint.X = (point1.X - centerTemp.X) / pt[0].X;
+			startPoint.Y = (point1.Y - centerTemp.Y) / pt[0].Y;
+
+			sign = 1;
+			if (startPoint.X < 0)	sign = -1;
+			float startAngle = sign * acos(startPoint.X / (sqrt(startPoint.X * startPoint.X + startPoint.Y * startPoint.Y)));
+
+			PointF endPoint;
+			endPoint.X = (-point1.X - centerTemp.X) / pt[0].X; 
+			endPoint.Y = (-point1.Y - centerTemp.Y) / pt[0].Y;
+
+			sign = 1;
+			if (startPoint.X * endPoint.X + startPoint.Y * endPoint.Y < 0)	sign = -1;
+			float deltaAngle = sign * acos((startPoint.X * endPoint.X + startPoint.Y * endPoint.Y) / (sqrt(startPoint.X * startPoint.X + startPoint.Y * startPoint.Y) * sqrt(endPoint.X * endPoint.X + endPoint.Y * endPoint.Y)));
+
+			startAngle =  startAngle * 180 / pi;
+			deltaAngle =  deltaAngle * 180 / pi;
+
+			if (pt[2].Y && deltaAngle < 0)	deltaAngle += 360;
+			else if (!pt[2].Y && deltaAngle > 0) deltaAngle -= 360;
+
+			path.AddArc(center.X - pt[0].X, center.Y - pt[0].Y, pt[0].X * 2, pt[0].Y * 2, startAngle, deltaAngle);
+
+			pre = pt[n - 1];
 			break;
 		}
 
@@ -683,8 +699,10 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 		delete[] pt;
 	}
 
-	graphics.FillPath(&brush, &path);
-	graphics.DrawPath(&pen, &path);
+	string id = getGradientId(color.color);
+	if (id != "") graphics.FillPath(shape.GetLinearGradient(GetGradient(id)), &path);
+	else graphics.FillPath(shape.GetFill(), &path);
+	graphics.DrawPath(shape.GetStroke(), &path);
 }
 
 VOID Drawer::DrawGroup(HDC hdc, Group shape)
@@ -739,3 +757,4 @@ wstring String2Wstring(string s)
 	wstring wContent = converter.from_bytes(s);
 	return wContent;
 }
+

@@ -11,65 +11,8 @@ Group::Group()
 
 Group::~Group() {}
 
-void Group::SetElement(vector<string> data)
-{
+void Group::SetElement(vector<string> data) {
 	readFigure(data);
-	//for (int i = 0; i < data.size(); ++i)
-	//{
-	//	
-
-	//	//if (data[i].compare("transform") == 0)
-	//	//{
-	//	//	++i;  //go to the value of transform
-	//	//	for (int j = 0; j < data[i].length(); ++j)
-	//	//		if (data[i][j] == '(' || data[i][j] == ')' || data[i][j] == ',')
-	//	//			data[i][j] = ' ';
-
-	//	//	string getter;
-	//	//	vector<string> collector;
-
-	//	//	stringstream str(data[i]);
-	//	//	while (str >> getter)
-	//	//		collector.push_back(getter);
-
-	//	//	for (int j = 0; j < collector.size(); ++j)
-	//	//	{
-	//	//		if (collector[j].compare("translate") == 0)
-	//	//		{
-	//	//			translate.x = stof(collector[++j]);
-	//	//			translate.y = stof(collector[++j]);
-	//	//		}
-	//	//		else if (collector[j].compare("scale") == 0)
-	//	//		{
-	//	//			scale.x = stof(collector[++j]);
-	//	//			scale.y = stof(collector[++j]);
-	//	//		}
-	//	//		else if (collector[j].compare("rotate") == 0)
-	//	//		{
-	//	//			angle = stof(collector[++j]);
-
-	//	//			if (j + 1 != collector.size())
-	//	//			{
-	//	//				bool isNum = true;
-	//	//				for (int k = 0; k < collector[j + 1].length(); ++k)
-	//	//					if (collector[j + 1][k] < '0' || collector[j + 1][k] > '9')
-	//	//					{
-	//	//						isNum = false;
-	//	//						break;
-	//	//					}
-
-	//	//				if (isNum) //This is when rotate has cx, cy
-	//	//				{
-	//	//					anchor.x = stof(collector[++j]);
-	//	//					anchor.y = stof(collector[++j]);
-	//	//				}
-	//	//			}
-	//	//		}
-	//	//	}
-	//	//}
-	//}
-
-
 }
 
 void Group::clear()
@@ -155,7 +98,6 @@ vector<int> Group::GetShapeID()
 	return this->shapeID;
 }
 
-
 void Group::ApplyGroup2Child()
 {
 	for (int i = 0; i < group.size(); ++i)
@@ -164,7 +106,7 @@ void Group::ApplyGroup2Child()
 		group[i].AddAngle(angle);
 		group[i].AddFillColor(fillColor);
 		group[i].AddStrokeColor(strokeColor);
-		//group[i].ApplyGroup2Child();
+		group[i].SetMatrix(matrix);
 	}
 
 	for (int i = 0; i < polygon.size(); ++i)
@@ -173,6 +115,7 @@ void Group::ApplyGroup2Child()
 		polygon[i].AddAngle(angle);
 		polygon[i].AddFillColor(fillColor);
 		polygon[i].AddStrokeColor(strokeColor);
+		polygon[i].SetMatrix(matrix);
 	}
 
 	for (int i = 0; i < text.size(); ++i)
@@ -181,6 +124,7 @@ void Group::ApplyGroup2Child()
 		text[i].AddAngle(angle);
 		text[i].AddFillColor(fillColor);
 		text[i].AddStrokeColor(strokeColor);
+		text[i].SetMatrix(matrix);
 	}
 
 	for (int i = 0; i < ellipse.size(); ++i)
@@ -189,6 +133,7 @@ void Group::ApplyGroup2Child()
 		ellipse[i].AddAngle(angle);
 		ellipse[i].AddFillColor(fillColor);
 		ellipse[i].AddStrokeColor(strokeColor);
+		ellipse[i].SetMatrix(matrix);
 	}
 
 	for (int i = 0; i < polyline.size(); ++i)
@@ -197,6 +142,7 @@ void Group::ApplyGroup2Child()
 		polyline[i].AddAngle(angle);
 		polyline[i].AddFillColor(fillColor);
 		polyline[i].AddStrokeColor(strokeColor);
+		polyline[i].SetMatrix(matrix);
 	}
 
 	for (int i = 0; i < path.size(); ++i)
@@ -205,5 +151,6 @@ void Group::ApplyGroup2Child()
 		path[i].AddAngle(angle);
 		path[i].AddFillColor(fillColor);
 		path[i].AddStrokeColor(strokeColor);
+		path[i].SetMatrix(matrix);
 	}
 }

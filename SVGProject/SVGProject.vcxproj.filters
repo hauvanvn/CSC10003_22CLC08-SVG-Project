@@ -31,6 +31,9 @@
     <ClCompile Include="Figure.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="GradientColor.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

@@ -55,9 +55,6 @@ public:
 class Figure
 {
 public:
-	/*void SetColor(RGBA color);
-	void SetStrokeWidth(float width);
-	void SetStrokeColor(RGBA color);*/
 	Figure();
 	~Figure();
 
@@ -69,15 +66,13 @@ public:
 	void AddStrokeColor(RGBA newColor);
 	void SetAnchor(Point2D anchor);
 	void SetScale(Point2D scale);
+	void SetMatrix(vector<float> matrix);
 	void Reset();
 
 	RGBA GetFillColor();
 	RGBA GetStrokeColor();
 	float GetStrokeWidth();
-	Point2D GetTranslate();
-	float GetAngle();
-	Point2D GetAnchor();
-	Point2D GetScale();
+	vector<float> GetMatrix();
 
 protected:
 	RGBA fillColor, strokeColor;
@@ -87,6 +82,7 @@ protected:
 	Point2D translate;
 	float angle;
 	Point2D scale;
+	vector<float> matrix;
 };
 
 class PolygonShape : public Figure

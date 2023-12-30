@@ -17,9 +17,27 @@ void Figure::readFigure(vector<string> data)
 {
 	for (int i = 0; i < data.size(); ++i)
 	{
-		if (data[i].compare("fill") == 0)
+		if (data[i].compare("fill") == 0 || data[i].compare("style") == 0)
 		{
- 			size_t foundRGB = data[++i].find("rgb");
+			if (data[i].compare("style") == 0)
+			{
+				++i;
+				int j = 0;
+				for (; j < data[i].length(); ++j)
+					if (data[i][j] != ':')	data[i][j] = ' ';
+					else
+					{
+						data[i][j] = ' ';
+						break;
+					}
+
+				string temp = "";
+				for (int k = j + 1; k < data[i].length(); ++k)
+					temp += data[i][k];
+
+				data[i] = temp;
+			}
+			size_t foundRGB = data[i].find("rgb");
 			if (foundRGB == string::npos)
 				if (data[i][0] != '#')
 					fillColor.color = data[i];
@@ -41,6 +59,7 @@ void Figure::readFigure(vector<string> data)
 				str >> getter;
 				fillColor.B = stof(getter);
 			}
+
 		}
 		else if (data[i].compare("stroke") == 0)
 		{
@@ -122,6 +141,11 @@ void Figure::readFigure(vector<string> data)
 						}
 					}
 				}
+				else if (collector[j].compare("matrix") == 0)
+				{
+					for (int k = 0; k < 6; ++k)
+						matrix.push_back(stof(collector[++j]));
+				}
 			}
 		}
 	}
@@ -161,6 +185,11 @@ void Figure::SetScale(Point2D scale)
 		this->scale = scale;
 }
 
+void Figure::SetMatrix(vector<float> matrix)
+{
+	this->matrix = matrix;
+}
+
 void Figure::Reset()
 {
 	Figure::Figure();
@@ -181,24 +210,9 @@ float Figure::GetStrokeWidth()
 	return this->strokeWidth;
 }
 
-Point2D Figure::GetTranslate()
+vector<float> Figure::GetMatrix()
 {
-	return this->translate;
-}
-
-float Figure::GetAngle()
-{
-	return this->angle;
-}
-
-Point2D Figure::GetAnchor()
-{
-	return this->anchor;
-}
-
-Point2D Figure::GetScale()
-{
-	return this->scale;
+	return matrix;
 }
 
 RGBA Hex2RGBA(string data)
@@ -266,4 +280,14 @@ RGBA Hex2RGBA(string data)
 	}
 
 	return color;
+}
+
+string getGradientId(string ID)
+{
+	string res = "";
+	if (ID.find("url") != string::npos)
+		for (int i = 4; i < ID.length(); ++i)
+			if (ID[i] != '(' && ID[i] != ')' && ID[i] != '#')
+				res += ID[i];
+	return res;
 }

@@ -62,32 +62,6 @@ void GradientColor::SetElement(vector<string> data)
 					translate.x = stof(collector[++j]);
 					translate.y = stof(collector[++j]);
 				}
-				//else if (collector[j].compare("scale") == 0)
-				//{
-				//	scale.x = stof(collector[++j]);
-				//	scale.y = stof(collector[++j]);
-				//}
-				//else if (collector[j].compare("rotate") == 0)
-				//{
-				//	angle = stof(collector[++j]);
-
-				//	if (j + 1 != collector.size())
-				//	{
-				//		bool isNum = true;
-				//		for (int k = 0; k < collector[j + 1].length(); ++k)
-				//			if (collector[j + 1][k] < '0' || collector[j + 1][k] > '9')
-				//			{
-				//				isNum = false;
-				//				break;
-				//			}
-
-				//		if (isNum) //This is when rotate has cx, cy
-				//		{
-				//			anchor.x = stof(collector[++j]);
-				//			anchor.y = stof(collector[++j]);
-				//		}
-				//	}
-				//}
 			}
 		}
 	}
@@ -96,14 +70,34 @@ void GradientColor::SetElement(vector<string> data)
 		points.push_back(secondPoint);
 }
 
-void GradientColor::clear(){
-	ID = ""; 
+void GradientColor::clear() {
+	ID = "";
 	translate.x = translate.y = 0;
 	points.clear();
 	stops.clear();
 }
 
-void GradientColor::addStopGradient(StopGradient stopGradient){
+void GradientColor::addStopGradient(StopGradient stopGradient) {
 	stops.push_back(stopGradient);
+}
+
+string GradientColor::GetID()
+{
+	return this->ID;
+}
+
+Point2D GradientColor::GetTranslate()
+{
+	return this->translate;
+}
+
+vector<Point2D> GradientColor::GetPoint()
+{
+	return this->points;
+}
+
+vector<StopGradient> GradientColor::GetStopColor()
+{
+	return this->stops;
 }
 

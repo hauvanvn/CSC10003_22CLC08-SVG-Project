@@ -3,7 +3,8 @@
 
 Path::Path()
 {
-	fillColor.A = 0;
+	fillColor.A = 1;
+	strokeColor.A = 0;
 }
 
 Path::~Path() {}
@@ -23,10 +24,12 @@ void Path::SetElement(vector<string> data)
 					data[i][j] = ' ';
 				else if (data[i][j] == '-') //add ' ' pos '-'
 				{
+					if ((data[i][j - 1] < '0' || data[i][j - 1] > '9') && data[i][j - 1] != ' ' && data[i][j - 1] != '\n')	continue;
 					data[i].insert(j, 1, ' ');
 					j++;
 				}
 				else if (data[i][j] == '.') //seperate float number
+				{
 					for (int k = j + 1; data[i][k] != ' ' && data[i][k] != '\n'; ++k)
 						if (data[i][k] == '.')
 						{
@@ -35,6 +38,7 @@ void Path::SetElement(vector<string> data)
 						}
 						else if (data[i][k] < '0' || data[i][k] > '9')
 							break;
+				}
 
 			for (int j = 0; j < data[i].length(); ++j)
 				if ((data[i][j] < '0' || data[i][j] > '9') && data[i][j] != '.' && data[i][j] != '-' && data[i][j] != ' ' && data[i][j] != '\n' && data[i][j] != 'e' && data[i][j] != 'E')
@@ -163,6 +167,7 @@ void Path::SetElement(vector<string> data)
 
 					str >> getter;
 					tempPoint.x = stof(getter); //x-axis-rotation
+					tempPoint.y = 0;
 					Shapes[j].points.push_back(tempPoint);
 
 					for (int k = 0; k < 2; ++k)
@@ -184,7 +189,7 @@ void Path::clear()
 	fillColor.color = strokeColor.color = "";
 	fillColor.R = fillColor.G = fillColor.B = 0;
 	strokeColor.R = strokeColor.G = strokeColor.B = 0;
-	fillColor.A = 0; strokeColor.A = 1;
+	fillColor.A = 1; strokeColor.A = 0;
 	strokeWidth = 1;
 
 	Shapes.clear();

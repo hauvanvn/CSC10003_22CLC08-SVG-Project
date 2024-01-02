@@ -11,7 +11,7 @@ Group::Group()
 
 Group::~Group() {}
 
-void Group::SetElement(vector<string> data) {
+void Group::SetElement(vector<string> data){
 	readFigure(data);
 }
 

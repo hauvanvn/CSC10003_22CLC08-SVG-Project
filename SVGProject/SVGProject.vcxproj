@@ -171,6 +171,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Stuff.cpp" />
     <ClCompile Include="Text.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -181,11 +182,16 @@
     <Image Include="SVGProject.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="SVGFolder\Apple_logo_black.svg" />
+    <None Include="SVGFolder\chrome-logo.svg" />
+    <None Include="SVGFolder\Firefox_logo_2019.svg" />
+    <None Include="SVGFolder\Instagram_logo_2016.svg" />
     <None Include="SVGFolder\sample.svg" />
     <None Include="SVGFolder\svg-01.svg" />
     <None Include="SVGFolder\svg-02.svg" />
     <None Include="SVGFolder\svg-03.svg" />
     <None Include="SVGFolder\svg-06.svg" />
+    <None Include="SVGFolder\TikTok_logo.svg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

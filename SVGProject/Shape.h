@@ -38,6 +38,7 @@ struct StopGradient {
 };
 
 class GradientColor {
+protected:
 	string ID;
 	Point2D translate;
 	vector<Point2D> points;
@@ -50,11 +51,19 @@ public:
 	void SetElement(vector<string>);
 	void clear();
 	void addStopGradient(StopGradient);
+
+	string GetID();
+	Point2D GetTranslate();
+	vector<Point2D> GetPoint();
+	vector<StopGradient> GetStopColor();
 };
 
 class Figure
 {
 public:
+	/*void SetColor(RGBA color);
+	void SetStrokeWidth(float width);
+	void SetStrokeColor(RGBA color);*/
 	Figure();
 	~Figure();
 
@@ -85,7 +94,21 @@ protected:
 	vector<float> matrix;
 };
 
-class PolygonShape : public Figure
+class Stuff : public Figure
+{
+public:
+	Stuff();
+	~Stuff();
+
+	virtual vector<PointF> getRectPos() = 0;
+
+	Matrix* GetTransform();
+	Pen* GetStroke();
+	Brush* GetFill();
+	Brush* GetLinearGradient(GradientColor gradient);
+};
+
+class PolygonShape : public Stuff
 {
 public:
 	PolygonShape();
@@ -97,13 +120,14 @@ public:
 	vector<Point2D> GetPoints();
 	float GetWidth();
 	float GetHeight();
+	vector<PointF> getRectPos();
 
 private:
 	vector<Point2D> point;
 	float width, height;
 };
 
-class Text : public Figure
+class Text : public Stuff
 {
 public:
 	Text();
@@ -116,6 +140,7 @@ public:
 	string GetText();
 	float GetSize();
 	Point2D GetPosition();
+	vector<PointF> getRectPos();
 private:
 	string font;
 	string text;
@@ -123,7 +148,7 @@ private:
 	Point2D position;
 };
 
-class EllipseShape : public Figure
+class EllipseShape : public Stuff
 {
 public:
 	EllipseShape();
@@ -135,13 +160,14 @@ public:
 	Point2D GetPosition();
 	float GetWidth();
 	float GetHeight();
+	vector<PointF> getRectPos();
 
 private:
 	Point2D center;
 	float width, height;
 };
 
-class PolylineShape : public Figure
+class PolylineShape : public Stuff
 {
 public:
 	PolylineShape();
@@ -151,6 +177,7 @@ public:
 	void clear();
 
 	vector<Point2D> GetPoints();
+	vector<PointF> getRectPos();
 
 private:
 	vector<Point2D> points;
@@ -161,7 +188,7 @@ struct PathShapes {
 	vector<Point2D> points;
 };
 
-class Path : public Figure
+class Path : public Stuff
 {
 public:
 	Path();
@@ -171,12 +198,13 @@ public:
 	void clear();
 
 	vector<PathShapes> GetPathShapes();
+	vector<PointF> getRectPos();
 
 private:
 	vector<PathShapes> Shapes;
 };
 
-class Group : public Figure
+class Group : public Stuff
 {
 public:
 	Group();
@@ -200,6 +228,7 @@ public:
 	vector<PolylineShape> GetPolyline();
 	vector<Path> GetPath();
 	vector<int> GetShapeID();
+	vector<PointF> getRectPos();
 
 	void ApplyGroup2Child();
 
@@ -210,6 +239,7 @@ private:
 	vector<EllipseShape> ellipse;
 	vector<PolylineShape> polyline;
 	vector<Path> path;
+	vector<float> matrix;
 
 	vector<int> shapeID;
 };
@@ -225,6 +255,8 @@ public:
 	Group readGroup(xml_node<>*, vector<string>);
 	void processData(vector<string> data, string tag);
 	
+	GradientColor GetGradient(string ID);
+
 	VOID Draw(HDC hdc);
 
 	VOID DrawPolygon(HDC hdc, PolygonShape shape);
@@ -252,5 +284,6 @@ private:
 
 wstring String2Wstring(string s);
 RGBA Hex2RGBA(string data);
+string getGradientId(string ID);
 
 #endif // !_SHAPE_H_

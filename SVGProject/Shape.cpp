@@ -700,7 +700,7 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 	}
 
 	string id = getGradientId(color.color);
-	if (id != "") graphics.FillPath(shape.GetLinearGradient(GetGradient(id)), &path);
+	if (id != "" && GetGradient(id).GetID() != "") graphics.FillPath(shape.GetLinearGradient(GetGradient(id)), &path);
 	else graphics.FillPath(shape.GetFill(), &path);
 	graphics.DrawPath(shape.GetStroke(), &path);
 }

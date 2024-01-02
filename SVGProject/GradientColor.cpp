@@ -70,14 +70,14 @@ void GradientColor::SetElement(vector<string> data)
 		points.push_back(secondPoint);
 }
 
-void GradientColor::clear() {
-	ID = "";
+void GradientColor::clear(){
+	ID = ""; 
 	translate.x = translate.y = 0;
 	points.clear();
 	stops.clear();
 }
 
-void GradientColor::addStopGradient(StopGradient stopGradient) {
+void GradientColor::addStopGradient(StopGradient stopGradient){
 	stops.push_back(stopGradient);
 }
 

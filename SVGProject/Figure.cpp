@@ -17,11 +17,10 @@ void Figure::readFigure(vector<string> data)
 {
 	for (int i = 0; i < data.size(); ++i)
 	{
-		if (data[i].compare("fill") == 0 || data[i].compare("style") == 0)
+		if (data[i].compare("fill") == 0 || data[i].compare("style") == 0) 
 		{
-			if (data[i].compare("style") == 0)
+			if (data[i++].compare("style") == 0)
 			{
-				++i;
 				int j = 0;
 				for (; j < data[i].length(); ++j)
 					if (data[i][j] != ':')	data[i][j] = ' ';
@@ -59,7 +58,7 @@ void Figure::readFigure(vector<string> data)
 				str >> getter;
 				fillColor.B = stof(getter);
 			}
-
+			
 		}
 		else if (data[i].compare("stroke") == 0)
 		{

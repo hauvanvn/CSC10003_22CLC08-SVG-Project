@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg">
-  <path d="M100,350 250,50" stroke="rgb(255,0,0)"
+  <path d="L100,350 250,50" stroke="rgb(255,0,0)"
   stroke-width="3" fill="none" />
-  <path d="M250,50 400,350" stroke="rgb(255,0,0)"
+  <path d="L250,50 400,350" stroke="rgb(255,0,0)"
   stroke-width="3" fill="none" />
-  <path d="M175,200 325,200" stroke="rgb(0,255,0)" stroke-width="3"
+  <path d="L175,200 325,200" stroke="rgb(0,255,0)" stroke-width="3"
   fill="none" />
   <path d="M100,350 C250,150 250,150 400,350" stroke="rgb(0,0,255)"
   stroke-width="5" fill="none" />

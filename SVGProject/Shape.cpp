@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Shape.h"
-
+#define Kappa 0.551915024494
+#define Pakka 1.5707963267948966
 Drawer::Drawer() {}
 
 Drawer::~Drawer() {}
@@ -631,14 +632,16 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 				pt[3].Y += pre.Y;
 			}
 
-			float cosAngle = cos(pt[1].X);
-			float sinAngle = sin(pt[1].X);
+			double pi = atan(1) * 4.f;
+			double angle = pt[1].X * pi / 180.f;
+			double cosAngle = cos(pt[1].X);
+			double sinAngle = sin(pt[1].X);
 
 			PointF point1;
-			point1.X = cosAngle * (pre.X - pt[3].X) / 2 + sinAngle * (pre.Y - pt[3].Y) / 2;
-			point1.Y = -sinAngle * (pre.X - pt[3].X) / 2 + cosAngle * (pre.Y - pt[3].Y) / 2;
+			point1.X = cosAngle * (pre.X - pt[3].X) / 2 + sinAngle * (pre.Y - pt[3].Y) / 2.f;
+			point1.Y = -sinAngle * (pre.X - pt[3].X) / 2 + cosAngle * (pre.Y - pt[3].Y) / 2.f;
 
-			float radiiCheck = (point1.X * point1.X) / (pt[0].X * pt[0].X) + (point1.Y * point1.Y) / (pt[0].Y * pt[0].Y);
+			double radiiCheck = (point1.X * point1.X) / (pt[0].X * pt[0].X) + (point1.Y * point1.Y) / (pt[0].Y * pt[0].Y);
 			if (radiiCheck > 1.0f)
 			{
 				pt[0].X = sqrt(radiiCheck) * pt[0].X;
@@ -646,40 +649,87 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 			}
 
 			PointF centerTemp;
-			float sign = 1; //positive
-			if (pt[2].X == pt[2].Y)	sign = -1;
+			double sign = 1; //positive
+			if (pt[2].X == pt[2].Y)	sign = -1.f;
 
 			centerTemp.X = sign * sqrt(abs(((pt[0].X * pt[0].X * pt[0].Y * pt[0].Y) - (pt[0].X * pt[0].X * point1.Y * point1.Y) - (point1.X * point1.X * pt[0].Y * pt[0].Y)) / ((pt[0].X * pt[0].X * point1.Y * point1.Y) + (point1.X * point1.X * pt[0].Y * pt[0].Y)))) * (pt[0].X * point1.Y / pt[0].Y);
 			centerTemp.Y = sign * sqrt(abs(((pt[0].X * pt[0].X * pt[0].Y * pt[0].Y) - (pt[0].X * pt[0].X * point1.Y * point1.Y) - (point1.X * point1.X * pt[0].Y * pt[0].Y)) / ((pt[0].X * pt[0].X * point1.Y * point1.Y) + (point1.X * point1.X * pt[0].Y * pt[0].Y)))) * (-pt[0].Y * point1.X / pt[0].X);
 
 			PointF center;
-			center.X = (cosAngle * centerTemp.X - sinAngle * +centerTemp.Y) + (pre.X + pt[3].X) / 2;
-			center.Y = (sinAngle * centerTemp.X + cosAngle * +centerTemp.Y) + (pre.Y + pt[3].Y) / 2;
+			center.X = (cosAngle * centerTemp.X - sinAngle * +centerTemp.Y) + (pre.X + pt[3].X) / 2.f;
+			center.Y = (sinAngle * centerTemp.X + cosAngle * +centerTemp.Y) + (pre.Y + pt[3].Y) / 2.f;
 
-			float pi = atan(1) * 4;
 			PointF startPoint;
 			startPoint.X = (point1.X - centerTemp.X) / pt[0].X;
 			startPoint.Y = (point1.Y - centerTemp.Y) / pt[0].Y;
 
-			sign = 1;
-			if (startPoint.X < 0)	sign = -1;
-			float startAngle = sign * acos(startPoint.X / (sqrt(startPoint.X * startPoint.X + startPoint.Y * startPoint.Y)));
+			sign = 1.f;
+			if (startPoint.Y < 0)	sign = -1.f;
+			double temp = startPoint.X / (sqrt(startPoint.X * startPoint.X + startPoint.Y * startPoint.Y));
+			if (temp < -1)	temp = -1.f;
+			else if (temp > 1)	temp = 1.f;
+			double startAngle = sign * acos(temp);
 
 			PointF endPoint;
 			endPoint.X = (-point1.X - centerTemp.X) / pt[0].X; 
 			endPoint.Y = (-point1.Y - centerTemp.Y) / pt[0].Y;
 
-			sign = 1;
-			if (startPoint.X * endPoint.X + startPoint.Y * endPoint.Y < 0)	sign = -1;
-			float deltaAngle = sign * acos((startPoint.X * endPoint.X + startPoint.Y * endPoint.Y) / (sqrt(startPoint.X * startPoint.X + startPoint.Y * startPoint.Y) * sqrt(endPoint.X * endPoint.X + endPoint.Y * endPoint.Y)));
+			if (startPoint.X * endPoint.Y - startPoint.Y * endPoint.X < 0)	sign = -1.f;
+			else	sign = 1.f;
+			temp = (startPoint.X * endPoint.X + startPoint.Y * endPoint.Y) / (sqrt(startPoint.X * startPoint.X + startPoint.Y * startPoint.Y) * sqrt(endPoint.X * endPoint.X + endPoint.Y * endPoint.Y));
+			if (temp < -1)	temp = -1.f;
+			else if (temp > 1)	temp = 1.f;
 
-			startAngle =  startAngle * 180 / pi;
-			deltaAngle =  deltaAngle * 180 / pi;
+			if (startPoint.X * endPoint.X + startPoint.Y * endPoint.Y < 0)	sign = -1.f;
+			double deltaAngle = sign * acos(temp);
 
-			if (pt[2].Y && deltaAngle < 0)	deltaAngle += 360;
-			else if (!pt[2].Y && deltaAngle > 0) deltaAngle -= 360;
+			if (pt[2].Y && deltaAngle < 0)	deltaAngle += 2.f * pi;
+			else if (!pt[2].Y && deltaAngle > 0) deltaAngle -= 2.f * pi;
 
-			path.AddArc(center.X - pt[0].X, center.Y - pt[0].Y, pt[0].X * 2, pt[0].Y * 2, startAngle, deltaAngle);
+			double ratio = abs(deltaAngle) / (pi / 2.f);
+			if (abs(1.f - ratio) < 0.00001)		ratio = 1.f;
+			int segment = max(static_cast<int>(ceil(ratio)), 1);
+			deltaAngle /= segment;
+
+			vector<vector<vector<double>>> curves;
+			vector<vector<double>> curve;
+			for (int t = 0; t < segment; ++t)
+			{
+				double kappa = (deltaAngle == Pakka) ? Kappa : (deltaAngle == -Pakka) ? -Kappa : 4.f / 3.f * tan(deltaAngle / 4.f);
+				double x3 = cos(startAngle);
+				double y3 = sin(startAngle);
+				double x4 = cos(startAngle + deltaAngle);
+				double y4 = sin(startAngle + deltaAngle);
+
+				curve.push_back({ x3 - y3 * kappa, y3 + x3 * kappa });
+				curve.push_back({ x4 + y4 * kappa, y4 - x4 * kappa });
+				curve.push_back({ x4, y4 });
+
+				curves.push_back(curve);
+
+				curve.clear();
+				startAngle += deltaAngle;
+			}
+
+			for (auto& cur : curves)
+			{
+				auto mapped_curve_0 = { (cosAngle * cur[0][0] * pt[0].X - sinAngle * cur[0][1] * pt[0].Y) + center.X, (sinAngle * cur[0][0] * pt[0].X + cosAngle * cur[0][1] * pt[0].Y) + center.Y };
+				auto mapped_curve_1 = { (cosAngle * cur[1][0] * pt[0].X - sinAngle * cur[1][1] * pt[0].Y) + center.X, (sinAngle * cur[1][0] * pt[0].X + cosAngle * cur[1][1] * pt[0].Y) + center.Y };
+				auto mapped_curve_2 = { (cosAngle * cur[2][0] * pt[0].X - sinAngle * cur[2][1] * pt[0].Y) + center.X, (sinAngle * cur[2][0] * pt[0].X + cosAngle * cur[2][1] * pt[0].Y) + center.Y };
+
+				cur = { mapped_curve_0, mapped_curve_1, mapped_curve_2 };
+
+				for (size_t j = 0; j < cur.size(); j += 3)
+					if (j + 2 < cur.size())
+					{
+						PointF P1(cur[j][0], cur[j][1]);
+						PointF P2(cur[j + 1][0], cur[j + 1][1]);
+						PointF P3(cur[j + 2][0], cur[j + 2][1]);
+						
+						path.AddBezier(pre, P1, P2, P3);
+						pre = P3;
+					}
+			}
 
 			pre = pt[n - 1];
 			break;
@@ -700,7 +750,7 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 	}
 
 	string id = getGradientId(color.color);
-	if (id != "" && GetGradient(id).GetID() != "") graphics.FillPath(shape.GetLinearGradient(GetGradient(id)), &path);
+	if (id != "") graphics.FillPath(shape.GetLinearGradient(GetGradient(id)), &path);
 	else graphics.FillPath(shape.GetFill(), &path);
 	graphics.DrawPath(shape.GetStroke(), &path);
 }

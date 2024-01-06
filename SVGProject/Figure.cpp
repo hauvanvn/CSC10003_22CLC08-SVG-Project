@@ -117,7 +117,18 @@ void Figure::readFigure(vector<string> data)
 				else if (collector[j].compare("scale") == 0)
 				{
 					scale.x = stof(collector[++j]);
-					scale.y = stof(collector[++j]);
+
+					bool exitScaleY = true;
+					if(++j != collector.size())
+					{
+						for (int k = 0; k < collector[j].length(); ++k)
+							if ((collector[j][k] < '0' || collector[j][k] > '9') && collector[j][k] != '.' && collector[j][k] != '-' && collector[j][k] != '%')
+							{
+								exitScaleY = false;
+								break;
+							}
+						if (exitScaleY)	scale.y = stof(collector[j]);
+					}
 				}
 				else if (collector[j].compare("rotate") == 0)
 				{

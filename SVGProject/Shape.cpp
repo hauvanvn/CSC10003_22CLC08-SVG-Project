@@ -399,7 +399,13 @@ VOID Drawer::DrawPolygon(HDC hdc, PolygonShape shape)
 	else
 	{
 		if (id != "")
-			graphics.FillRectangle(shape.GetLinearGradient(GetGradient(id)), p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
+		{
+			if (GetGradient(id).GetID() != "")
+				graphics.FillRectangle(shape.GetLinearGradient(GetGradient(id)), p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
+			else
+				if (color.color != "none")
+					graphics.FillRectangle(shape.GetFill(), p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());
+		}
 		else
 			if (color.color != "none")
 				graphics.FillRectangle(shape.GetFill(), p[0].x, p[0].y, shape.GetWidth(), shape.GetHeight());

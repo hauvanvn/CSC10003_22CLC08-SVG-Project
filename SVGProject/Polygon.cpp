@@ -72,6 +72,15 @@ void PolygonShape::clear() {
 
 vector<Point2D> PolygonShape::GetPoints()
 {
+	if (this->point.size() == 0)
+	{
+		Point2D res;
+		res.x = res.y = 0;
+
+		vector<Point2D> RES;
+		RES.push_back(res);
+		return RES;
+	}
 	return this->point;
 }
 

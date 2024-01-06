@@ -34,6 +34,9 @@
     <ClCompile Include="GradientColor.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Stuff.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -86,16 +89,19 @@
     <None Include="SVGFolder\sample.svg">
       <Filter>SVG</Filter>
     </None>
-    <None Include="SVGFolder\svg-01.svg">
+    <None Include="SVGFolder\Apple_logo_black.svg">
       <Filter>SVG</Filter>
     </None>
-    <None Include="SVGFolder\svg-02.svg">
+    <None Include="SVGFolder\chrome-logo.svg">
       <Filter>SVG</Filter>
     </None>
-    <None Include="SVGFolder\svg-03.svg">
+    <None Include="SVGFolder\Firefox_logo_2019.svg">
       <Filter>SVG</Filter>
     </None>
-    <None Include="SVGFolder\svg-06.svg">
+    <None Include="SVGFolder\Instagram_logo_2016.svg">
+      <Filter>SVG</Filter>
+    </None>
+    <None Include="SVGFolder\TikTok_logo.svg">
       <Filter>SVG</Filter>
     </None>
   </ItemGroup>

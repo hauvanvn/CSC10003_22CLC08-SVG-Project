@@ -11,7 +11,7 @@ void Drawer::readGradient(xml_node<>* root)
 	xml_node<>* node = root->first_node();
 
 	string nodeName;
-	
+
 	xml_attribute<>* attribute;
 	string attributeName;
 	string attributeValue;
@@ -19,7 +19,7 @@ void Drawer::readGradient(xml_node<>* root)
 
 	GradientColor gradient;
 
-	while(node != NULL)
+	while (node != NULL)
 	{
 		nodeName = node->name();
 		if (nodeName.compare("linearGradient") != 0)
@@ -46,7 +46,7 @@ void Drawer::readGradient(xml_node<>* root)
 		}
 
 		gradient.SetElement(collector);
-		
+
 		collector.clear();
 
 		StopGradient stopG;
@@ -123,6 +123,8 @@ GradientColor Drawer::GetGradient(string ID)
 	for (int i = 0; i < ListLinearGradient.size(); ++i)
 		if (ID == ListLinearGradient[i].GetID())
 			return ListLinearGradient[i];
+
+	return GradientColor();
 }
 
 void Drawer::processData(vector<string> collector, string tag)
@@ -194,7 +196,7 @@ Group Drawer::readGroup(xml_node<>* node, vector<string> data)
 		attribute = child->first_attribute();
 		if (attribute == NULL)
 		{
-			if(tag.compare("g") == 0)
+			if (tag.compare("g") == 0)
 			{
 				tempG = readGroup(child, collector);
 				result.setGroup(tempG);
@@ -380,9 +382,15 @@ VOID Drawer::DrawPolygon(HDC hdc, PolygonShape shape)
 		}
 
 		if (id != "")
-			graphics.FillPolygon(shape.GetLinearGradient(GetGradient(id)), pt, p.size());
-		else 
-			if (color.color != "none") 
+		{
+			if (GetGradient(id).GetID() != "")
+				graphics.FillPolygon(shape.GetLinearGradient(GetGradient(id)), pt, p.size());
+			else
+				if (color.color != "none")
+					graphics.FillPolygon(shape.GetFill(), pt, p.size());
+		}
+		else
+			if (color.color != "none")
 				graphics.FillPolygon(shape.GetFill(), pt, p.size());
 		graphics.DrawPolygon(shape.GetStroke(), pt, p.size());
 
@@ -413,7 +421,13 @@ VOID Drawer::DrawText(HDC hdc, Text shape)
 
 	string id = getGradientId(color.color);
 	if (id != "")
-		graphics.DrawString(String2Wstring(shape.GetText()).c_str(), -1, &font, point, shape.GetLinearGradient(GetGradient(id)));
+	{
+		if (GetGradient(id).GetID() != "")
+			graphics.DrawString(String2Wstring(shape.GetText()).c_str(), -1, &font, point, shape.GetLinearGradient(GetGradient(id)));
+		else
+			if (color.color != "none")
+				graphics.DrawString(String2Wstring(shape.GetText()).c_str(), -1, &font, point, shape.GetFill());
+	}
 	else
 		if (color.color != "none")
 			graphics.DrawString(String2Wstring(shape.GetText()).c_str(), -1, &font, point, shape.GetFill());
@@ -424,13 +438,19 @@ VOID Drawer::DrawEllipse(HDC hdc, EllipseShape shape)
 	Graphics graphics(hdc);
 
 	graphics.SetTransform(shape.GetTransform());
-	
+
 	RectF ellipseRect(shape.GetPosition().x - shape.GetWidth(), shape.GetPosition().y - shape.GetHeight(), shape.GetWidth() * 2, shape.GetHeight() * 2);
 
 	RGBA color = shape.GetFillColor();
 	string id = getGradientId(color.color);
 	if (id != "")
-		graphics.FillEllipse(shape.GetLinearGradient(GetGradient(id)), ellipseRect);
+	{
+		if (GetGradient(id).GetID() != "")
+			graphics.FillEllipse(shape.GetLinearGradient(GetGradient(id)), ellipseRect);
+		else
+			if (color.color != "none")
+				graphics.FillEllipse(shape.GetFill(), ellipseRect);
+	}
 	else
 		if (color.color != "none")
 			graphics.FillEllipse(shape.GetFill(), ellipseRect);
@@ -453,10 +473,16 @@ VOID Drawer::DrawPolyline(HDC hdc, PolylineShape shape)
 	}
 
 	string id = getGradientId(color.color);
-	if (id != "") 
-		graphics.FillPolygon(shape.GetLinearGradient(GetGradient(id)), pt, p.size());
+	if (id != "")
+	{
+		if (GetGradient(id).GetID() != "")
+			graphics.FillPolygon(shape.GetLinearGradient(GetGradient(id)), pt, p.size());
+		else
+			if (color.color != "none")
+				graphics.FillPolygon(shape.GetFill(), pt, p.size());
+	}
 	else
-		if (color.color != "none") 
+		if (color.color != "none")
 			graphics.FillPolygon(shape.GetFill(), pt, p.size());
 	graphics.DrawLines(shape.GetStroke(), pt, p.size());
 
@@ -671,7 +697,7 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 			double startAngle = sign * acos(temp);
 
 			PointF endPoint;
-			endPoint.X = (-point1.X - centerTemp.X) / pt[0].X; 
+			endPoint.X = (-point1.X - centerTemp.X) / pt[0].X;
 			endPoint.Y = (-point1.Y - centerTemp.Y) / pt[0].Y;
 
 			if (startPoint.X * endPoint.Y - startPoint.Y * endPoint.X < 0)	sign = -1.f;
@@ -725,7 +751,7 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 						PointF P1(cur[j][0], cur[j][1]);
 						PointF P2(cur[j + 1][0], cur[j + 1][1]);
 						PointF P3(cur[j + 2][0], cur[j + 2][1]);
-						
+
 						path.AddBezier(pre, P1, P2, P3);
 						pre = P3;
 					}
@@ -750,7 +776,12 @@ VOID Drawer::DrawPath(HDC hdc, Path shape)
 	}
 
 	string id = getGradientId(color.color);
-	if (id != "") graphics.FillPath(shape.GetLinearGradient(GetGradient(id)), &path);
+	if (id != "")
+	{
+		if (GetGradient(id).GetID() != "")
+			graphics.FillPath(shape.GetLinearGradient(GetGradient(id)), &path);
+		else graphics.FillPath(shape.GetFill(), &path);
+	}
 	else graphics.FillPath(shape.GetFill(), &path);
 	graphics.DrawPath(shape.GetStroke(), &path);
 }

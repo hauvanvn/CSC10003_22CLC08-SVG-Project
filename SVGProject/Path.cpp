@@ -60,7 +60,7 @@ void Path::SetElement(vector<string> data)
 					while (str >> getter) //count similar shapes
 					{
 						for (int k = 0; k < getter.length(); ++k)
-							if ((getter[k] < '0' || getter[k] > '9') && getter[k] != '-' && getter[k] != '.' && data[i][j] != 'e' && data[i][j] != 'E')
+							if ((getter[k] < '0' || getter[k] > '9') && getter[k] != '-' && getter[k] != '.' && getter[k] != 'e' && getter[k] != 'E')
 							{
 								if (k != 0) //seperate cases where the letter stuck between 2 number
 									count++;
@@ -91,7 +91,7 @@ void Path::SetElement(vector<string> data)
 						if (count % 6 != 0)
 							break;
 					}
-					else if (shape.type == 'S' || shape.type == 's')
+					else if (shape.type == 'S' || shape.type == 's' || shape.type == 'Q' || shape.type == 'q')
 					{
 						for (int k = 0; k < count / 4; ++k)
 							Shapes.push_back(shape);
@@ -148,7 +148,7 @@ void Path::SetElement(vector<string> data)
 						tempPoint.y = stof(getter);
 						Shapes[j].points.push_back(tempPoint);
 					}
-				else if (Shapes[j].type == 'S' || Shapes[j].type == 's')
+				else if (Shapes[j].type == 'S' || Shapes[j].type == 's' || Shapes[j].type == 'Q' || Shapes[j].type == 'q')
 					for (int k = 0; k < 2; ++k)
 					{
 						str >> getter;

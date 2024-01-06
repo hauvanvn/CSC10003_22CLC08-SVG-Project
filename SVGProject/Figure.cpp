@@ -174,13 +174,13 @@ void Figure::AddAngle(float angle)
 
 void Figure::AddFillColor(RGBA newColor)
 {
-	if (fillColor.R == 0 && fillColor.G == 0 && fillColor.B == 0 && fillColor.A == 1)
+	if (fillColor.R == 0 && fillColor.G == 0 && fillColor.B == 0 && fillColor.A == 1 && fillColor.color == "")
 		fillColor = newColor;
 }
 
 void Figure::AddStrokeColor(RGBA newColor)
 {
-	if (strokeColor.R == 0 && strokeColor.G == 0 && strokeColor.B == 0 && strokeColor.A == 1)
+	if (strokeColor.R == 0 && strokeColor.G == 0 && strokeColor.B == 0 && strokeColor.A == 1 && strokeColor.color == "")
 		strokeColor = newColor;
 }
 

@@ -104,5 +104,8 @@
     <None Include="SVGFolder\TikTok_logo.svg">
       <Filter>SVG</Filter>
     </None>
+    <None Include="SVGFolder\test.svg">
+      <Filter>SVG</Filter>
+    </None>
   </ItemGroup>
 </Project>

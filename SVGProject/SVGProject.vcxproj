@@ -187,6 +187,7 @@
     <None Include="SVGFolder\Firefox_logo_2019.svg" />
     <None Include="SVGFolder\Instagram_logo_2016.svg" />
     <None Include="SVGFolder\sample.svg" />
+    <None Include="SVGFolder\test.svg" />
     <None Include="SVGFolder\TikTok_logo.svg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
